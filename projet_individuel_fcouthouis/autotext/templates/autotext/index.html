@@ -1,0 +1,39 @@
+{% extends 'autotext/base.html' %} {% block content %}
+<div class="container">
+  <div class="row">
+    <form class="post-form col-md" method="post">
+      {% csrf_token %}
+
+      <div class="input-group">
+        {{ form.urlList }}
+
+        {%if webography_output is not None %}
+        <span class="input-group-addon glyphicon glyphicon-search"></span>
+        <textarea class="col-md" rows="20" readonly
+          >{{ webography_output }}
+        </textarea>
+        {%endif%}
+
+        <div class="col-md">{{ form.generated_webography }}</div>
+      </div>
+
+      <div class="row">
+        <label class="col-sm-1">
+          Norme :
+        </label>
+        {% for radio in form.standard %}
+        <label class="radio-inline ">
+          {{ radio }}
+        </label>
+        {% endfor %}
+      </div>
+      <br />
+
+      <button type="submit" class="btn btn-primary float-right">
+        Génerer ma webographie
+      </button>
+    </form>
+  </div>
+</div>
+<span class="glyphicon glyphicon-search"></span>
+{% endblock %}
