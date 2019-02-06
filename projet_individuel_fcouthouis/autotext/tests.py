@@ -31,9 +31,11 @@ class SourceTest(TestCase):
 
 class WebographyTest(TestCase):
     def test_get_structurated_url_list(self):
-        raw_url_list = "https://docs.djangoproject.com/fr/2.1/topics/testing/overview/    https://github.com/django/djangoproject.com,https://stackoverflow.com/questions/32022024/django-code-organisation https://getbootstrap.com/docs/4.0/components/input-group/https://docs.djangoproject.com/fr/2.1/topics/testing/overview/"
+        raw_url_list = "https://docs.djangoproject.com/fr/2.1/topics/testing/overview/  https://github.com/django/djangoproject.com  http://notionsinformatique.free.fr/mac/ipad_guide_utilisateur.pdf  , https://stackoverflow.com/questions/32022024/django-code-organisation https://getbootstrap.com/docs/4.0/components/input-group/"
         webography = Webography(raw_url_list)
-        expected = ["https://docs.djangoproject.com/fr/2.1/topics/testing/overview/", "https://github.com/django/djangoproject.com",
+        expected = ["https://docs.djangoproject.com/fr/2.1/topics/testing/overview/", "https://github.com/django/djangoproject.com", "http://notionsinformatique.free.fr/mac/ipad_guide_utilisateur.pdf",
                     "https://stackoverflow.com/questions/32022024/django-code-organisation", "https://getbootstrap.com/docs/4.0/components/input-group/"]
+        tested = webography.get_structurated_url_list()
 
-        self.assertEqual(webography.get_structurated_url_list(), expected)
+        # On fait le test sur des sets puisque l'ordre dans lequel sont présentés les éléments n'importe pas ici
+        self.assertEqual(set(tested), set(expected))
