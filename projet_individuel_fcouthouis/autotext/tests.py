@@ -23,8 +23,8 @@ class SourceTest(TestCase):
 
     def test_get_language_on_article(self):
         url = "https://www.lemonde.fr/international/article/2019/01/30/qu-est-ce-que-le-backstop-irlandais-au-c-ur-du-rejet-de-l-accord-sur-le-brexit_5416730_3210.html"
-        contentExtraction = ContentExtraction()
-        content = contentExtraction.get_content(url)
+        contentExtraction = ContentExtraction(url)
+        content = contentExtraction.get_content()
         result_fr = Source().get_language(content)[0]
         self.assertEqual(result_fr, 'fr')
 
@@ -39,3 +39,18 @@ class WebographyTest(TestCase):
 
         # On fait le test sur des sets puisque l'ordre dans lequel sont présentés les éléments n'importe pas ici
         self.assertEqual(set(tested), set(expected))
+
+
+class ContentExtractionTest(TestCase):
+    def test_get_author(self):
+        testUrl1 = "https://www.lemonde.fr/planete/article/2019/02/12/une-nouvelle-etude-suggere-un-effet-des-aliments-ultra-transformes-sur-la-sante_5422252_3244.html"
+        testUrl2 = "https://www.nytimes.com/2019/02/11/world/europe/russia-polar-bears-emergency.html"
+        testUrl3 = "https://www.liberation.fr/france/2019/02/12/patrick-drahi-laisse-les-cles-de-l-express-a-alain-weill_1708889"
+
+        urls = [testUrl1, testUrl2, testUrl3]
+        expecteds = ["Pascale Santi", "Andrew E. Kramer", "Jerome Lefilliatre"]
+
+        for url, expected in zip(urls, expecteds):
+            CE = ContentExtraction(url)
+            tested = CE.get_author()
+            self.assertEqual(tested, expected)

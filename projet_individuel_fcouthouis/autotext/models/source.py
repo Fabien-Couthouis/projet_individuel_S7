@@ -1,7 +1,7 @@
 from datetime import date
 import spacy
 from spacy_cld import LanguageDetector
-# import contentExtraction
+# from contentExtraction import ContentExtraction
 
 
 class Source():
@@ -9,16 +9,16 @@ class Source():
     # Need to be stored as a class variable
     language_detector = LanguageDetector()
 
-    # def __init__(self):
-    # url = ""
-    # language = ""
-    # title = ""
-    # author_firstname = ""
-    # author_lastname = ""
-    # publication_date = date.today()
-    # last_consultation_date = date.today()
+    def __init__(self, url=""):
+        self.url = url
+        # language = ""
+        # title = ""
+        # author_firstname = ""
+        # author_lastname = ""
+        # publication_date = date.today()
+        # last_consultation_date = date.today()
 
-    def get_language(self, text):
+    def get_language(self, text=""):
         nlp = spacy.load('en')
         nlp.add_pipe(Source.language_detector)
         doc = nlp(text)

@@ -1,3 +1,8 @@
+{% load static %}
+
+<!-- La balise de gabarit static  génère l’URL absolue des fichiers statiques. -->
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
 {% if latest_question_list %}
 <ul>
   <p>oui</p>
