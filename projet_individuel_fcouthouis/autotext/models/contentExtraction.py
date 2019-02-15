@@ -11,6 +11,7 @@ class ContentExtraction():
 
     def __init__(self, url=""):
         self.url = url
+        self.content = self.get_content()
 
     def simple_get(self):
         """
@@ -48,23 +49,13 @@ class ContentExtraction():
         return soup
 
     def get_author(self):
-        content = self.get_content()
         name = ""
-        # Is one of them present in one of the tags below ?
+        # Is one of them present in one of the elements below ?
         keyWords = ["by", "author"]
+        metas = self.content.find_all('meta')
+        elementsToSearch = ['name', 'property']
 
-        for meta in content.find_all('meta'):
-            # Tag meta 'name'
-            if not (meta.get('name') is None):
-                if any(keyWord in meta.get('name') for keyWord in keyWords):
-                    name = meta.get('content')
-                    break
-
-            # Tag meta 'property'
-            elif not (meta.get('property') is None):
-                if any(keyWord in meta.get('property') for keyWord in keyWords):
-                    name = meta.get('content')
-                    break
+        name = self.get_meta_content(metas, elementsToSearch, keyWords)
 
         if name == "":
             self.log_error("No author found for this url : " + self.url)
@@ -85,10 +76,43 @@ class ContentExtraction():
         # Put uppercases on first letter of the name
         name = name.title()
         # Remove digits
-        name = re.sub("\d+", "", name)
+        name = re.sub(r"\d+", "", name)
         # Remove "By"
         name = re.sub("[B|b]y", "", name)
         # Remove leading whitespaces
         name = name.lstrip()
 
         return name
+
+    def get_title(self):
+        title = ""
+        # Is one of them present in one of the elements below ?
+        keyWords = ["title"]
+        metas = self.content.find_all('meta')
+        elementsToSearch = ['property']
+
+        title = self.get_meta_content(metas, elementsToSearch, keyWords)
+
+        if title == "":
+            self.log_error("No title found for this url : " + self.url)
+
+        return title
+
+    def get_meta_content(self, metas, elementsToSearch, keyWords):
+        i = 0
+        metaContent = ""
+
+        while (metaContent == "" and i < len(metas)):
+            meta = metas[i]
+
+            for element in elementsToSearch:
+                if not (meta.get(element) is None):
+                    if any(keyWord in meta.get(element) for keyWord in keyWords):
+                        metaContent = meta.get('content')
+                        # metaContent found : we can break the for
+                        break
+
+            # No metaContent found : iterate on the next <meta> tag
+            i += 1
+
+        return metaContent

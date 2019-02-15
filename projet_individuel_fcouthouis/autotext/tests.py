@@ -42,15 +42,23 @@ class WebographyTest(TestCase):
 
 
 class ContentExtractionTest(TestCase):
+    testUrl1 = "https://www.lemonde.fr/planete/article/2019/02/12/une-nouvelle-etude-suggere-un-effet-des-aliments-ultra-transformes-sur-la-sante_5422252_3244.html"
+    testUrl2 = "https://www.nytimes.com/2019/02/11/world/europe/russia-polar-bears-emergency.html"
+    testUrl3 = "https://www.liberation.fr/france/2019/02/12/patrick-drahi-laisse-les-cles-de-l-express-a-alain-weill_1708889"
+    urls = [testUrl1, testUrl2, testUrl3]
+
     def test_get_author(self):
-        testUrl1 = "https://www.lemonde.fr/planete/article/2019/02/12/une-nouvelle-etude-suggere-un-effet-des-aliments-ultra-transformes-sur-la-sante_5422252_3244.html"
-        testUrl2 = "https://www.nytimes.com/2019/02/11/world/europe/russia-polar-bears-emergency.html"
-        testUrl3 = "https://www.liberation.fr/france/2019/02/12/patrick-drahi-laisse-les-cles-de-l-express-a-alain-weill_1708889"
-
-        urls = [testUrl1, testUrl2, testUrl3]
         expecteds = ["Pascale Santi", "Andrew E. Kramer", "Jerome Lefilliatre"]
-
-        for url, expected in zip(urls, expecteds):
+        for url, expected in zip(ContentExtractionTest().urls, expecteds):
             CE = ContentExtraction(url)
             tested = CE.get_author()
+            self.assertEqual(tested, expected)
+
+    def test_get_title(self):
+        expecteds = ["Une nouvelle étude suggère un effet néfaste des aliments ultratransformés sur la santé",
+                     "Polar Bears Have Invaded a Russian Outpost, and They’re Hungry", "Patrick Drahi laisse les clés de «l'Express» à Alain Weill"]
+
+        for url, expected in zip(ContentExtractionTest().urls, expecteds):
+            CE = ContentExtraction(url)
+            tested = CE.get_title()
             self.assertEqual(tested, expected)

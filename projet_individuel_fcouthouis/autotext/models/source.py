@@ -1,4 +1,3 @@
-from datetime import date
 import spacy
 from spacy_cld import LanguageDetector
 # from contentExtraction import ContentExtraction
