@@ -3,6 +3,7 @@ from django.test import TestCase
 from .models.source import Source
 from .models.webography import Webography
 from .models.contentExtractionSite import ContentExtractionSite
+from .models.contentExtractionPDF import ContentExtractionPDF
 
 
 # python manage.py test autotext.tests.SourceTest
@@ -75,6 +76,7 @@ class ContentExtractionSiteTest(TestCase):
             self.assertEqual(tested, expected)
 
 # python manage.py test autotext.tests.ContentExtractionPDFTest
+# A bit longer because of pdf files downloads
 
 
 class ContentExtractionPDFTest(TestCase):
@@ -83,5 +85,28 @@ class ContentExtractionPDFTest(TestCase):
     testUrl3 = "https://nutritionj.biomedcentral.com/track/pdf/10.1186/s12937-019-0433-7"
     urls = [testUrl1, testUrl2, testUrl3]
 
-    def test_(self):
-        return
+    def test_get_author_name(self):
+        expecteds = ["Mahesh Chandra Mukkamala, Matthias Hein",
+                     "Matthew D. Zeiler", "Ali Alami"]
+        for url, expected in zip(ContentExtractionPDFTest().urls, expecteds):
+            CE = ContentExtractionPDF(url)
+            tested = CE.get_author_name()
+            print(tested)
+            self.assertEqual(tested, expected)
+
+    # def test_get_title(self):
+    #     expecteds = ["Une nouvelle étude suggère un effet néfaste des aliments ultratransformés sur la santé",
+    #                  "Polar Bears Have Invaded a Russian Outpost, and They’re Hungry", "Patrick Drahi laisse les clés de «l'Express» à Alain Weill"]
+
+    #     for url, expected in zip(ContentExtractionPDFTest().urls, expecteds):
+    #         CE = ContentExtractionPDF(url)
+    #         tested = CE.get_title()
+    #         self.assertEqual(tested, expected)
+
+    # def test_get_publication_date(self):
+    #     expecteds = ["2019-02-12T04:05:55+00:00",
+    #                  "2019-02-11T21:44:17.000Z", "2019-02-12T15:25:03"]
+    #     for url, expected in zip(ContentExtractionPDFTest().urls, expecteds):
+    #         CE = ContentExtractionPDF(url)
+    #         tested = CE.get_publication_date()
+    #         self.assertEqual(tested, expected)

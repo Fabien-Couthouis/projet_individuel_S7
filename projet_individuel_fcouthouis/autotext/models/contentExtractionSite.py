@@ -11,9 +11,12 @@ class ContentExtractionSite(ContentExtraction):
 
     def __init__(self, url=""):
         self.url = url
-        self.content = self.get_content()
+        self._content = self.get_content()
+        self._author_name = ""
+        self._title = ""
+        self._publication_date = ""
 
-    def simple_get(self):
+    def get_content(self):
         """
         Attempts to get the content at `url` by making an HTTP GET request.
         If the content-type of response is some kind of HTML/XML, return the
@@ -22,7 +25,11 @@ class ContentExtractionSite(ContentExtraction):
         try:
             with closing(get(self.url, stream=True)) as resp:
                 if self.is_good_response(resp):
-                    return resp.content
+                    rawContent = resp.content
+                    formattedContent = BeautifulSoup(
+                        rawContent, 'html.parser')
+
+                    return formattedContent
                 else:
                     return None
 
@@ -40,19 +47,13 @@ class ContentExtractionSite(ContentExtraction):
                 and content_type is not None
                 and content_type.find('html') > -1)
 
-    # def log_error(self, e):
-    #     print(e)
-
-    def get_content(self):
-        html_doc = self.simple_get()
-        soup = BeautifulSoup(html_doc, 'html.parser')
-        return soup
-
     def get_author_name(self):
-        name = ""
+        if self._author_name != "":
+            return self._author_name
+
         # Is one of them present in one of the elements below ?
         keyWords = ["by", "author"]
-        metas = self.content.find_all('meta')
+        metas = self._content.find_all('meta')
         elementsToSearch = ['name', 'property']
 
         name = self.get_meta_content(metas, elementsToSearch, keyWords)
@@ -60,9 +61,9 @@ class ContentExtractionSite(ContentExtraction):
         if name == "":
             self.log_error("No author found for this url : " + self.url)
 
-        name = self.format_author_name(name)
+        self._author_name = self.format_author_name(name)
 
-        return name
+        return self._author_name
 
     def format_author_name(self, name):
         '''Transform raw author name into formatted author name. For instance : http://www.nytimes/1550mireille-mathieu -> Mireille Mathieu'''
@@ -85,32 +86,36 @@ class ContentExtractionSite(ContentExtraction):
         return name
 
     def get_title(self):
-        title = ""
+        if self._title != "":
+            return self._author_name
+
         # Is one of them present in one of the elements below ?
         keyWords = ["title"]
-        metas = self.content.find_all('meta')
+        metas = self._content.find_all('meta')
         elementsToSearch = ['property']
 
-        title = self.get_meta_content(metas, elementsToSearch, keyWords)
+        self._title = self.get_meta_content(metas, elementsToSearch, keyWords)
 
-        if title == "":
+        if self._title == "":
             self.log_error("No title found for this url : " + self.url)
 
-        return title
+        return self._title
 
     def get_publication_date(self):
-        date = ""
+        if self._publication_date != "":
+            return self._publication_date
 
         keyWords = ["published"]
-        metas = self.content.find_all('meta')
+        metas = self._content.find_all('meta')
         elementsToSearch = ['property']
 
-        date = self.get_meta_content(metas, elementsToSearch, keyWords)
+        self._publication_date = self.get_meta_content(
+            metas, elementsToSearch, keyWords)
 
-        if date == "":
+        if self._publication_date == "":
             self.log_error("No date found for this url : " + self.url)
 
-        return date
+        return self._publication_date
 
     def get_meta_content(self, metas, elementsToSearch, keyWords):
         i = 0
