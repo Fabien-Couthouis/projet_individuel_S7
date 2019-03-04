@@ -1,5 +1,5 @@
 import spacy
-from .source import Source
+from .article import Article
 from urlextract import URLExtract
 
 
