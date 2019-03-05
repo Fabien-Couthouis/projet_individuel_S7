@@ -35,8 +35,8 @@ class ArticlePDF(Article):
 
         return metadata
 
-    def get_source(self, format="bibtex"):
+    def get_bibtex_reference(self):
         title = pdftitle.get_title(self.content.name)
-        source = gscholar.query(title)
-        self.content.close()
+        source = gscholar.query(title)[0]
+        # self.content.close()
         return source

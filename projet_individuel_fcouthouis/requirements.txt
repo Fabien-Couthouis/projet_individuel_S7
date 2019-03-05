@@ -43,3 +43,6 @@ spacy_cld == 0.1.0
 
 # autotext/models/webography.py: 3
 urlextract == 0.8.3
+
+# autotext/models/article.py: 2
+pybtex-apa-style == 1.3

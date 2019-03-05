@@ -13,9 +13,6 @@ class ArticleSite(Article):
     def __init__(self, url=""):
         super().__init__(url)
         self._content = self.get_content()
-        self._author_name = ""
-        self._title = ""
-        self._publication_date = ""
 
     def get_content(self):
         """
@@ -49,9 +46,6 @@ class ArticleSite(Article):
                 and content_type.find('html') > -1)
 
     def get_author_name(self):
-        if self._author_name != "":
-            return self._author_name
-
         # Is one of them present in one of the elements below ?
         keyWords = ["by", "author"]
         metas = self._content.find_all('meta')
@@ -62,9 +56,9 @@ class ArticleSite(Article):
         if name == "":
             self.log_error("No author found for this url : " + self.url)
 
-        self._author_name = self._format_author_name(name)
+        formattedName = self._format_author_name(name)
 
-        return self._author_name
+        return formattedName
 
     def _format_author_name(self, name):
         '''Transform raw author name into formatted author name. For instance : http://www.nytimes/1550mireille-mathieu -> Mireille Mathieu'''
@@ -87,25 +81,19 @@ class ArticleSite(Article):
         return name
 
     def get_title(self):
-        if self._title != "":
-            return self._author_name
-
         # Is one of them present in one of the elements below ?
         keyWords = ["title"]
         metas = self._content.find_all('meta')
         elementsToSearch = ['property']
 
-        self._title = self._get_meta_content(metas, elementsToSearch, keyWords)
+        title = self._get_meta_content(metas, elementsToSearch, keyWords)
 
-        if self._title == "":
+        if title == "":
             self.log_error("No title found for this url : " + self.url)
 
-        return self._title
+        return title
 
     def get_publication_date(self):
-        if self._publication_date != "":
-            return self._publication_date
-
         keyWords = ["published"]
         metas = self._content.find_all('meta')
         elementsToSearch = ['property']
@@ -113,19 +101,32 @@ class ArticleSite(Article):
         publicationDate = self._get_meta_content(
             metas, elementsToSearch, keyWords)
 
-        self._publication_date = self._format_publication_date(publicationDate)
+        # Convert pubdate from string to datetime
+        formattedPublicationDate = self._format_publication_date(
+            publicationDate)
 
-        if self._publication_date == "":
+        if formattedPublicationDate == "":
             self.log_error("No date found for this url : " + self.url)
 
-        return self._publication_date
+        return formattedPublicationDate
 
     def _format_publication_date(self, isoStringPubDate):
-        dt = datetime.strptime(isoStringPubDate, "%Y-%m-%dT%H:%M:%S%z")
-        apaPublicDate = datetime.strftime(dt, "%Y, %d %B")
-        return apaPublicDate
+        """Convert string publication date into an exploitable datetime. """
+        # We need to remove the ":" because '%z' in strptime doesnt requiere any ":" so that we do not get any error.
+        # See https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior for more info.
+        isoStringPubDate = isoStringPubDate.replace(":", "")
+        dt = datetime.strptime(isoStringPubDate, "%Y-%m-%dT%H%M%S%z")
+        return dt
 
     def _get_meta_content(self, metas, elementsToSearch, keyWords):
+        """
+        Use beautifulsoup to get content corresponding to the keywords in the given element, parsing meta tags into the htlm doc.
+
+        Arguments:
+            metas -- List of all meta tags in the html document.
+            elementsToSearch -- List of all elements in the meta tag wherein we want a keyword to be.
+            keyWords -- List of keywords to search in the referenced elements.
+     """
         i = 0
         metaContent = ""
 
@@ -143,3 +144,25 @@ class ArticleSite(Article):
             i += 1
 
         return metaContent
+
+    def get_bibtex_reference(self):
+        author = self.get_author_name()
+        title = self.get_title()
+        pubDate = self.get_publication_date()
+        # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
+        bibRef = ("""
+                        @misc{{website,
+                        author = {{{author}}},
+                        title = {{{title}}},
+                        url = {{{url}}},
+                        year={{{year}}},
+                        month={{{month}}},
+                        note = {{{note}}}
+                        }}
+                        """).format(author=author,
+                                    title=title,
+                                    url=self.url,
+                                    year=pubDate.strftime("%Y"),
+                                    month=pubDate.strftime("%B"),
+                                    note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
+        return bibRef
