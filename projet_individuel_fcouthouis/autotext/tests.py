@@ -1,6 +1,5 @@
 # https://docs.python.org/2/library/unittest.html
 from django.test import TestCase
-from .models.article import Article
 from .models.webography import Webography
 from .models.articleSite import ArticleSite
 from .models.articlePDF import ArticlePDF
@@ -38,7 +37,7 @@ class WebographyTest(TestCase):
         webography = Webography(raw_url_list)
         expected = ["https://docs.djangoproject.com/fr/2.1/topics/testing/overview/", "https://github.com/django/djangoproject.com", "http://notionsinformatique.free.fr/mac/ipad_guide_utilisateur.pdf",
                     "https://stackoverflow.com/questions/32022024/django-code-organisation", "https://getbootstrap.com/docs/4.0/components/input-group/"]
-        tested = webography.get_structurated_url_list()
+        tested = webography.get_structurated_urls_list()
 
         # Order does not matter here so we use sets instead of lists
         self.assertEqual(set(tested), set(expected))

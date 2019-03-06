@@ -1,6 +1,6 @@
 # import spacy
 # from spacy_cld import LanguageDetector
-from abc import ABC, abstractmethod, ABCMeta
+from abc import ABC, abstractmethod
 import pybtex.database.input.bibtex
 import six
 import io
@@ -11,14 +11,14 @@ class Article(ABC):
     # language_detector = LanguageDetector()
 
     def __init__(self, url=""):
-        self.url = url
         self.content = None
+        self.url = url
 
     def __str__(self):
         return self.url
 
     @abstractmethod
-    def get_content(self):
+    def _get_content(self):
         """Get the raw content of the article (html or text). """
         raise NotImplementedError('subclasses must override get_content()!')
 
@@ -49,7 +49,10 @@ class Article(ABC):
         output = io.StringIO()
         pybtex_html_backend.write_to_stream(data_formatted, output)
 
-        return output.getvalue()
+        # We remove "\n" at the end of the output value
+        formatted_ref = output.getvalue().replace("\n", "")
+
+        return formatted_ref
 
     # def get_source(self, standardType='apa'):
     #     if standardType == 'apa':

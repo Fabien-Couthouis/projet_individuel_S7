@@ -2,9 +2,9 @@ from django import forms
 
 
 class PostUrlListForm(forms.Form):
-    standards = [
+    format_styles = [
         ('APA', 'APA'),
-        ('AFNOR', 'AFNOR'),
+        ('BIB', 'BIBTEX'),
     ]
 
     urlList = forms.CharField(
@@ -16,10 +16,10 @@ class PostUrlListForm(forms.Form):
     #     disabled=True)
     # # initial="Cliquez sur le bouton 'Générer ma webographie' ")
 
-    standard = forms.ChoiceField(
+    format_style = forms.ChoiceField(
         required=False,
         widget=forms.RadioSelect(),
-        choices=standards,
-        initial=standards[0],
-        label='Norme : '
+        choices=format_styles,
+        initial=format_styles[0],
+        label='Format : '
     )

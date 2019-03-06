@@ -1,24 +1,54 @@
-import spacy
-from .article import Article
+from .articlePDF import ArticlePDF
+from .articleSite import ArticleSite
 from urlextract import URLExtract
+import requests
 
 
 class Webography():
 
-    def __init__(self, raw_url_list):
-        self.raw_url_list = raw_url_list
-        self.structured_url_list = [""]
+    def __init__(self, raw_urls_string):
+        self.raw_urls = raw_urls_string
+        self.articles = []
 
-    def get_structurated_url_list(self):
-        if self.structured_url_list == [""]:
-            extractor = URLExtract()
-            # Si raw_url_list ne contient pas d'url, renvoie [] (et pas [""])
-            structured_url_list = extractor.find_urls(self.raw_url_list)
+    def get_structurated_urls_list(self):
+        """Get a structurated list of urls from the raw_urls string"""
+        extractor = URLExtract()
+        # Return [] if no url is present in raw_url_list(and not [""])
+        structured_urls = extractor.find_urls(self.raw_urls)
 
-            # Suppression des occurences multiples et ajout dans la propriété
-            self.structured_url_list = list(set(structured_url_list))
+        # Multiple occurence suppression by passing structured_url_list into a set
+        structured_urls = list(set(structured_urls))
 
-        return self.structured_url_list
+        return structured_urls
 
-    def generate(self, standard):
-        return "I am the " + standard + " webography :)"
+    def generate_articles(self):
+        """Generate the list of articles in self.articles. Each article corresponds to one url."""
+        structured_urls = self.get_structurated_urls_list()
+        for url in structured_urls:
+            r = requests.get(url)
+            content_type = r.headers.get('content-type')
+
+            if 'application/pdf' in content_type:
+                article = ArticlePDF(url)
+            elif 'text/html' in content_type:
+                article = ArticleSite(url)
+            else:
+                article = None
+
+            self.articles.append(article)
+
+    def get_bibtex_webography(self):
+        bib_webography = []
+        for article in self.articles:
+            bib_ref = article.get_bibtex_reference()
+            bib_webography.append(bib_ref)
+
+        return bib_webography
+
+    def get_formatted_webography(self, style='apa'):
+        formatted_webography = []
+        for article in self.articles:
+            formatted_ref = article.get_formatted_reference(style)
+            formatted_webography.append(formatted_ref)
+
+        return formatted_webography

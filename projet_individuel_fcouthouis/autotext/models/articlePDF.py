@@ -11,10 +11,9 @@ class ArticlePDF(Article):
 
     def __init__(self, url=""):
         super().__init__(url)
-        self.content = None
-        self.get_content()
+        self._get_content()
 
-    def get_content(self):
+    def _get_content(self):
         try:
             response = get(self.url)
             raw_data = response.content
@@ -36,7 +35,10 @@ class ArticlePDF(Article):
         return metadata
 
     def get_bibtex_reference(self):
+        # self.content.name gives the path to the self.content tempfile
+        print("NAME : " + self.content.name)
         title = pdftitle.get_title(self.content.name)
+        print("TITLE : " + title)
         source = gscholar.query(title)[0]
         # self.content.close()
         return source

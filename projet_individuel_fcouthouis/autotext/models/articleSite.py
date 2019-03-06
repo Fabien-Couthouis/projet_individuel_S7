@@ -12,9 +12,9 @@ class ArticleSite(Article):
 
     def __init__(self, url=""):
         super().__init__(url)
-        self._content = self.get_content()
+        self._content = self._get_content()
 
-    def get_content(self):
+    def _get_content(self):
         """
         Attempts to get the content at `url` by making an HTTP GET request.
         If the content-type of response is some kind of HTML/XML, return the
@@ -150,19 +150,11 @@ class ArticleSite(Article):
         title = self.get_title()
         pubDate = self.get_publication_date()
         # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
-        bibRef = ("""
-                        @misc{{website,
-                        author = {{{author}}},
-                        title = {{{title}}},
-                        url = {{{url}}},
-                        year={{{year}}},
-                        month={{{month}}},
-                        note = {{{note}}}
-                        }}
-                        """).format(author=author,
-                                    title=title,
-                                    url=self.url,
-                                    year=pubDate.strftime("%Y"),
-                                    month=pubDate.strftime("%B"),
-                                    note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
+        bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
+                  ).format(author=author,
+                           title=title,
+                           url=self.url,
+                           year=pubDate.strftime("%Y"),
+                           month=pubDate.strftime("%B"),
+                           note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
         return bibRef
