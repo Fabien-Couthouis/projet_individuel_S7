@@ -16,10 +16,12 @@ class ArticlePDF(Article):
     def _get_content(self):
         try:
             response = get(self.url)
-            raw_data = response.content
+            temp = tempfile.NamedTemporaryFile()
+            temp.write(response.content)
+            # "After writing, the file handle must be “rewound” using seek() in order to read the data back from it." > error with pdfminer if not done
+            temp.seek(0)
 
-            self.content = tempfile.NamedTemporaryFile()
-            self.content.write(raw_data)
+            self.content = temp
 
             return self.content
 
@@ -37,8 +39,15 @@ class ArticlePDF(Article):
     def get_bibtex_reference(self):
         # self.content.name gives the path to the self.content tempfile
         print("NAME : " + self.content.name)
+        # title = pdftitle.get_title("temp")
         title = pdftitle.get_title(self.content.name)
+
         print("TITLE : " + title)
-        source = gscholar.query(title)[0]
-        # self.content.close()
-        return source
+
+        source = gscholar.query(title)
+        print(source)
+
+        if len(source) != 0:
+            return source[0]
+        else:
+            return None

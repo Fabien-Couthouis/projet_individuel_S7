@@ -115,7 +115,10 @@ class ArticleSite(Article):
         # We need to remove the ":" because '%z' in strptime doesnt requiere any ":" so that we do not get any error.
         # See https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior for more info.
         isoStringPubDate = isoStringPubDate.replace(":", "")
-        dt = datetime.strptime(isoStringPubDate, "%Y-%m-%dT%H%M%S%z")
+        # Remove utc info, sometimes the format differs and we do not care about hours
+        isoStringPubDate = isoStringPubDate[:17]
+        print(isoStringPubDate)
+        dt = datetime.strptime(isoStringPubDate, "%Y-%m-%dT%H%M%S")
         return dt
 
     def _get_meta_content(self, metas, elementsToSearch, keyWords):

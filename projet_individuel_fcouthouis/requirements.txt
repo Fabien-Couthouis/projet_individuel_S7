@@ -13,36 +13,28 @@
 # projet_individuel_fcouthouis/wsgi.py: 12
 Django == 2.1.5
 
-# autotext/BROUILLON.py: 6,7
 # autotext/models/articlePDF.py: 4
 PyPDF2 == 1.26.0
 
 # autotext/models/articleSite.py: 5
 beautifulsoup4 == 4.7.1
 
-# autotext/BROUILLON.py: 2
 # autotext/models/articlePDF.py: 7
 gscholar == 1.6.1
 
-# autotext/BROUILLON.py: 8
 # autotext/models/articlePDF.py: 6
 pdftitle == 20170309
 
-# autotext/BROUILLON.py: 5
+# autotext/models/article.py: 4
+pybtex == 0.22.2
+
 # autotext/models/articlePDF.py: 2,3
 # autotext/models/articleSite.py: 2,3
+# autotext/models/webography.py: 4
 requests == 2.18.4
 
-# autotext/BROUILLON.py: 3
-# autotext/models/article.py: 1
-# autotext/models/webography.py: 1
-spacy == 2.0.18
-
-# autotext/models/article.py: 2
-spacy_cld == 0.1.0
+# autotext/models/article.py: 5
+six == 1.11.0
 
 # autotext/models/webography.py: 3
 urlextract == 0.8.3
-
-# autotext/models/article.py: 2
-pybtex-apa-style == 1.3

@@ -26,7 +26,7 @@ class Webography():
         structured_urls = self.get_structurated_urls_list()
         for url in structured_urls:
             r = requests.get(url)
-            content_type = r.headers.get('content-type')
+            content_type = r.headers['Content-Type'].lower()
 
             if 'application/pdf' in content_type:
                 article = ArticlePDF(url)

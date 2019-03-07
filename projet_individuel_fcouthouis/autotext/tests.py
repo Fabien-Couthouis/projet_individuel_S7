@@ -116,7 +116,7 @@ class ArticlePDFTest(TestCase):
         self.assertEqual(creationDate, 'D:20171129015351Z')
 
     def test_get_bibtext_reference(self):
-        article = ArticlePDF(ArticlePDFTest().testUrl3)
+        article = ArticlePDF(ArticlePDFTest().testUrl4)
         expected = '@article{alami2019factors,\n  title={Factors that influence dietary behavior toward iron and vitamin D consumption based on the theory of planned behavior in Iranian adolescent girls},\n  author={Alami, Ali and Sany, Seyedeh Belin Tavakoly and Lael-Monfared, Elaheh and Ferns, Gordon A and Tatari, Maryam and Hosseini, Zahra and Jafari, Alireza},\n  journal={Nutrition journal},\n  volume={18},\n  number={1},\n  pages={8},\n  year={2019},\n  publisher={BioMed Central}\n}\n'
         self.assertEqual(article.get_bibtex_reference(), expected)
 
