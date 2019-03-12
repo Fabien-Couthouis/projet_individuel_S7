@@ -1,0 +1,55 @@
+.page-header {
+  margin-top: 0;
+  padding: 20px 20px 20px 40px;
+}
+
+.btn.btn-auth {
+  background-color: rgb(104, 145, 162);
+  padding: 0px;
+  font-weight: 700;
+  font-size: 14px;
+  height: 36px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: none;
+  -o-transition: all 0.218s;
+  -moz-transition: all 0.218s;
+  -webkit-transition: all 0.218s;
+  transition: all 0.218s;
+}
+
+.btn.btn-auth:hover,
+.btn.btn-auth:active,
+.btn.btn-auth:focus {
+  background-color: #4d90fe;
+}
+
+.nav-link {
+  color: white;
+  opacity: 0.9;
+  text-align: left;
+}
+
+.nav-icon {
+  color: white;
+  font-size: 32px;
+}
+
+.connect {
+  font-size: 24px;
+}
+
+.userMenuText {
+  color: black;
+}
+.userMenuText:hover {
+  color: rgb(124, 146, 172);
+}
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:visited {
+  background-color: rgb(12, 83, 165);
+  border-color: rgb(12, 83, 165);
+}
