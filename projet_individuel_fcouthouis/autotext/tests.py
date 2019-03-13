@@ -1,8 +1,8 @@
 # https://docs.python.org/2/library/unittest.html
 from django.test import TestCase
 from .models.webography import Webography
-from .models.articleSite import ArticleSite
-from .models.articlePDF import ArticlePDF
+from .models.referenceWeb import ReferenceWeb
+from .models.referencePDF import ReferencePDF
 
 
 # python manage.py test autotext.tests.ArticleTest
@@ -24,7 +24,7 @@ from .models.articlePDF import ArticlePDF
 
 # def test_get_language_on_article(self):
 #     url = "https://www.lemonde.fr/international/article/2019/01/30/qu-est-ce-que-le-backstop-irlandais-au-c-ur-du-rejet-de-l-accord-sur-le-brexit_5416730_3210.html"
-#     article = ArticleSite(url)
+#     article = ReferenceWeb(url)
 #     content = article.get_content()
 #     result_fr = Article().get_language(content)[0]
 #     self.assertEqual(result_fr, 'fr')
@@ -53,7 +53,7 @@ class ArticleSiteTest(TestCase):
     def test_get_author_name(self):
         expecteds = ["Pascale Santi", "Andrew E. Kramer", "Jerome Lefilliatre"]
         for url, expected in zip(ArticleSiteTest().urls, expecteds):
-            article = ArticleSite(url)
+            article = ReferenceWeb(url)
             tested = article.get_author_name()
             self.assertEqual(tested, expected)
 
@@ -62,7 +62,7 @@ class ArticleSiteTest(TestCase):
                      "Polar Bears Have Invaded a Russian Outpost, and They’re Hungry", "Patrick Drahi laisse les clés de «l'Express» à Alain Weill"]
 
         for url, expected in zip(ArticleSiteTest().urls, expecteds):
-            article = ArticleSite(url)
+            article = ReferenceWeb(url)
             tested = article.get_title()
             self.assertEqual(tested, expected)
 
@@ -70,18 +70,18 @@ class ArticleSiteTest(TestCase):
         expecteds = ["2019-02-12T04:05:55+00:00",
                      "2019-02-11T21:44:17.000Z", "2019-02-12T15:25:03"]
         for url, expected in zip(ArticleSiteTest().urls, expecteds):
-            article = ArticleSite(url)
+            article = ReferenceWeb(url)
             tested = article.get_publication_date()
             self.assertEqual(tested, expected)
 
     # No error test
     def test_get_bibtex_reference(self):
-        article = ArticleSite(ArticleSiteTest().testUrl1)
+        article = ReferenceWeb(ArticleSiteTest().testUrl1)
         tested = article.get_bibtex_reference()
         print("test_get_bibtex_reference : " + tested)
 
     def test_get_formatted_reference(self):
-        article = ArticleSite(ArticleSiteTest().testUrl1)
+        article = ReferenceWeb(ArticleSiteTest().testUrl1)
         expected = "Pascale Santi, P. S. (2019, 12 février). Une nouvelle étude suggère un effet néfaste des aliments ultratransformés sur la santé. Récupéré 5 mars, 2019, de https://www.lemonde.fr/planete/article/2019/02/12/une-nouvelle-etude-suggere-un-effet-des-aliments-ultra-transformes-sur-la-sante_5422252_3244.html"
         tested = article.get_formatted_reference()
 
@@ -104,7 +104,7 @@ class ArticlePDFTest(TestCase):
     urls = [testUrl1, testUrl2, testUrl3, testUrl4, testUrl5, testUrl6]
 
     def test_get_metadata(self):
-        article = ArticlePDF(ArticlePDFTest().testUrl1)
+        article = ReferencePDF(ArticlePDFTest().testUrl1)
         metadata = article.get_metadata()
         author = metadata['/Author']
         title = metadata['/Title']
@@ -116,12 +116,12 @@ class ArticlePDFTest(TestCase):
         self.assertEqual(creationDate, 'D:20171129015351Z')
 
     def test_get_bibtext_reference(self):
-        article = ArticlePDF(ArticlePDFTest().testUrl4)
+        article = ReferencePDF(ArticlePDFTest().testUrl4)
         expected = '@article{alami2019factors,\n  title={Factors that influence dietary behavior toward iron and vitamin D consumption based on the theory of planned behavior in Iranian adolescent girls},\n  author={Alami, Ali and Sany, Seyedeh Belin Tavakoly and Lael-Monfared, Elaheh and Ferns, Gordon A and Tatari, Maryam and Hosseini, Zahra and Jafari, Alireza},\n  journal={Nutrition journal},\n  volume={18},\n  number={1},\n  pages={8},\n  year={2019},\n  publisher={BioMed Central}\n}\n'
         self.assertEqual(article.get_bibtex_reference(), expected)
 
     def test_get_apaSource(self):
-        article = ArticlePDF(ArticlePDFTest().testUrl3)
+        article = ReferencePDF(ArticlePDFTest().testUrl3)
         expected = "[Alami et al., 2019] Alami, A., Sany, S. B. T., Lael-Monfared, E., Ferns, G. A., Tatari, M., Hosseini, Z., & Jafari, A. (2019). Factors that influence dietary behavior toward iron and vitamin d consumption based on the theory of planned behavior in iranian adolescent girls. Nutrition journal, 18(1), 8."
         print(expected)
         print(article.get_formatted_reference())

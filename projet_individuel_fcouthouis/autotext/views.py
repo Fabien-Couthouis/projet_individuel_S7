@@ -3,7 +3,6 @@ from .forms import PostUrlListForm
 from .forms import SignUpForm
 from .models.webography import Webography
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 
 
 def index(request):
@@ -44,3 +43,7 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+
+def myReferences(request):
+    return

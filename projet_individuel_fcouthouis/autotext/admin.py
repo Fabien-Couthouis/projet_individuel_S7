@@ -1,3 +1,9 @@
 from django.contrib import admin
+from django.contrib.admin import AdminSite
 
-# Register your models here.
+from .models.referencePDF import ReferencePDF
+from .models.referenceWeb import ReferenceWeb
+
+
+admin.site.register(ReferencePDF)
+admin.site.register(ReferenceWeb)

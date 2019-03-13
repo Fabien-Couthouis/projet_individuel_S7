@@ -1,5 +1,5 @@
-from .articlePDF import ArticlePDF
-from .articleSite import ArticleSite
+from .referencePDF import ReferencePDF
+from .referenceWeb import ReferenceWeb
 from urlextract import URLExtract
 import requests
 
@@ -29,9 +29,9 @@ class Webography():
             content_type = r.headers['Content-Type'].lower()
 
             if 'application/pdf' in content_type:
-                article = ArticlePDF(url)
+                article = ReferencePDF(url)
             elif 'text/html' in content_type:
-                article = ArticleSite(url)
+                article = ReferenceWeb(url)
             else:
                 article = None
 
