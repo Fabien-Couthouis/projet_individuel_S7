@@ -10,19 +10,20 @@
             <strong>{{ error }}</strong>
         </div>
         {% endfor %}
-        <div class="form-group input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text"> <i class="{{field.field.widget.attrs.icon}}"></i> </span>
-             </div>
-             <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.field.widget.attrs.placeholder }}" class="form-control"> 
-            <!-- <input name="" id="{{ field.name }}" name="{{ field.html_name }}" class="form-control" placeholder="{{ field.placeholder }}" value="{% if field.value %}{{ field.value }}{% endif %}" type="text"> -->
-            </div> <!-- form-group// -->
+        <div class="form-group">
+          <div class="input-group">
+              <div class="input-group-prepend">
+                  <span class="input-group-text"> <i class="{{field.field.widget.attrs.icon}}"></i> </span>
+              </div>
+              <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="id_{{ field.name }}" placeholder="{{ field.field.widget.attrs.placeholder }}" class="form-control"> 
+              </div>
         {% if field.help_text %}
-            <small style="color: grey">{{ field.help_text }}</small>
+            <small class="form-text text-muted" style="color: grey">{{ field.help_text }}</small>
         {% endif %}
-       
+        </div> <!-- form-group// -->
       </p>
     {% endfor %}
+
     <button class="btn btn-dark btn-block btn-auth" type="submit">S'inscrire</button>
   </form>
 </div>

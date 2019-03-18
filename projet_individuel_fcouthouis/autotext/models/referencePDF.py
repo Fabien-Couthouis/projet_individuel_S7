@@ -36,13 +36,15 @@ class ReferencePDF(Reference):
 
         return metadata
 
-    def get_bibtex_reference(self):
-        # self._content.name gives the path to the self._content tempfile
-        title = pdftitle.get_title(self._content.name)
+    @property
+    def bibtex_reference(self):
+        if self.bibtex_reference is not None:
+            # self._content.name gives the path to the self._content tempfile
+            title = pdftitle.get_title(self._content.name)
 
-        source = gscholar.query(title)
+            source = gscholar.query(title)
 
-        if len(source) != 0:
-            return source[0]
-        else:
-            return None
+            if source:
+                self.bibtex_reference = source[0]
+
+        return self.bibtex_reference

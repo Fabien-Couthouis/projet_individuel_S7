@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import ModelForm
 from django import forms
+from .models.reference import Reference
 
 
 class PostUrlListForm(forms.Form):
@@ -35,3 +37,9 @@ class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields
+
+
+class ReferenceForm(ModelForm):
+    class Meta:
+        model = Reference
+        fields = ['url', '_bibtex_reference']

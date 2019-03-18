@@ -1,4 +1,3 @@
-
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
@@ -150,7 +149,8 @@ class ReferenceWeb(Reference):
 
         return metaContent
 
-    def get_bibtex_reference(self):
+    @property
+    def bibtex_reference(self):
         author = self.get_author_name()
         title = self.get_title()
         pubDate = self.get_publication_date()
@@ -162,4 +162,6 @@ class ReferenceWeb(Reference):
                            year=pubDate.strftime("%Y"),
                            month=pubDate.strftime("%B"),
                            note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
-        return bibRef
+
+        self.bibtex_reference = bibRef
+        return self.bibtex_reference
