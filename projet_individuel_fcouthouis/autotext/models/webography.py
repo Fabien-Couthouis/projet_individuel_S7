@@ -34,9 +34,6 @@ class Webography(models.Model):
         """Generate the list of articles in self.articles. Each article corresponds to one url."""
         structured_urls = self.get_structurated_urls_list()
         this = Webography.objects.filter(id=self.id)[0]
-        # for attr in dir(this):
-        #     if hasattr(this, attr):
-        #         print("obj.%s = %s" % (attr, getattr(this, attr)))
         for url in structured_urls:
             r = requests.get(url)
             content_type = r.headers['Content-Type'].lower()
@@ -55,22 +52,27 @@ class Webography(models.Model):
     def get_bibtex_webography(self):
         bib_webography = []
         this = Webography.objects.get(id=self.id)
-        for ref in this.referencepdf_set.all(), this.referenceweb_set.all():
-            bib_ref = ref.get_bibtex_reference()
-            bib_webography.append(bib_ref)
+        # Parse the 2 reference_set
+        for ref in this.referencepdf_set.all():
+            bib_webography.append(ref.bibtex_reference)
+
+        for ref in this.referenceweb_set.all():
+            print(ref.bibtex_reference)
+            bib_webography.append(ref.bibtex_reference)
 
         return bib_webography
 
     def get_formatted_webography(self, style='apa'):
         formatted_webography = []
         this = Webography.objects.get(id=self.id)
-        for ref in this.referencepdf_set.all():
-            formatted_ref = ref.get_formatted_reference(style)
-            formatted_webography.append(formatted_ref)
 
-        # for ref in this.referenceweb_set.all():
-        #     print(2)
-        #     formatted_ref = ref.get_formatted_reference(style)
-        #     formatted_webography.append(formatted_ref)
+        # Parse the 2 reference_set
+        for ref in this.referencepdf_set.all():
+            print(ref)
+            formatted_webography.append(ref.apa_reference)
+
+        for ref in this.referenceweb_set.all():
+            print(ref)
+            formatted_webography.append(ref.apa_reference)
 
         return formatted_webography

@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from django import forms
 from .models.reference import Reference
+from .models.webography import Webography
 
 
 class PostUrlListForm(forms.Form):
@@ -39,7 +40,7 @@ class SignUpForm(UserCreationForm):
         fields = UserCreationForm.Meta.fields
 
 
-class ReferenceForm(ModelForm):
+class WebographyForm(ModelForm):
     class Meta:
-        model = Reference
-        fields = ['url', '_bibtex_reference']
+        model = Webography
+        fields = ['raw_urls', 'user']

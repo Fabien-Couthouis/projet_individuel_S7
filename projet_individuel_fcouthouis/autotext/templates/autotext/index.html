@@ -1,3 +1,4 @@
+<!-- templates/registration/index.html -->
 {% extends 'autotext/base.html' %} {% block content %}
 <div class="container">
   <div class="row">
@@ -22,9 +23,7 @@
           Format :
         </label>
         {% for radio in form.format_style %}
-        <label class="radio-inline ">
-          {{ radio }} </label
-        ><span> </span>
+        <label class="radio-inline "> {{ radio }} </label><span> </span>
         {% endfor %}
       </div>
       <br />

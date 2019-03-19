@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .forms import PostUrlListForm
 from .forms import SignUpForm
-from .forms import ReferenceForm
+from .forms import WebographyForm
 from .models.webography import Webography
 from django.contrib.auth import login, authenticate
+from itertools import chain
 
 
 def index(request):
@@ -48,15 +49,24 @@ def signup(request):
 
 
 def myReferences(request):
-    if request.method == 'POST':
-        form = ReferenceForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('/')
+    # Check if user is logged in
+    if not request.user.is_authenticated:
+        return redirect('/accounts/login')
     else:
-        form = SignUpForm()
-    return render(request, 'registration/signup.html', {'form': form})
+        if request.method == 'POST':
+            form = WebographyForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+                referencepdf_set = Webography.objects.get(
+                    user=request.user).referencepdf_set.all()
+                referenceweb_set = Webography.objects.get(
+                    user=request.user).referenceweb_set.all()
+
+                reference_set = list(
+                    chain(referencepdf_set, referenceweb_set))
+
+                return render(request, 'autotext/myReferences.html', {'form': form, 'reference_set': reference_set})
+        else:
+            form = WebographyForm()
+            return render(request, 'autotext/myReferences.html', {'form': form})

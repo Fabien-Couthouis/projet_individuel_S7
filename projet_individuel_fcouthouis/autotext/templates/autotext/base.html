@@ -1,3 +1,4 @@
+<!-- templates/registration/base.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -80,7 +81,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Mes références</a>
+              <a class="nav-link" href="/myReferences">Mes références</a>
             </li>
           </ul>
         </div>
@@ -110,52 +111,10 @@
           </a>
           <div id="login-dp" class="row dropdown-menu">
               <div class="col-md-12">
-                <form action="" method="post" class="submission-form">
-                  {% if form.errors %}
-                    <p class="error">Sorry, that is not a valid username or password</p>
-                  {% endif %}
-
-                      <div class="input-group">
-                          <div class="input-group-prepend">
-                              <span id="fa-user-form" class="input-group-text">
-                                  <i class="fa fa-user login-icon"></i>
-                              </span>
-                          </div>
-                          <input type="text" class="form-control" name="username" id="username" placeholder="Identifiant" required>
-                      </div>
-
-                      <div class="input-group">
-                          <div class="input-group-prepend">
-                              <span id="fa-user-form" class="input-group-text">
-                                  <i class="fa fa-lock login-icon"></i>
-                              </span>
-                          </div>
-                          <input type="password" name="password" id="password" class="form-control" placeholder="Mot de passe" required>
-                      </div>
-                      <div class="form-group">
-                          <button type="submit" value="login" formaction="/accounts/login/" class="btn btn-primary btn-block btn-auth">Connexion</button>
-                          {% csrf_token %}
-                          <input type="hidden" name="next" value="{{ next|escape }}" />
-                      </div>
-                      <div class="help-block text-right float-left">
-                          <a class="registerLink" href="/signup">Inscription</a>
-                      </div>
-                  </form>
+                {% include "../registration/loginForm.html" %}
               </div>
           </div>
           {% endif %}
-          <!-- <form action="" method="post" class="submission-form">
-            {% if form.errors %}
-              <p class="error">Sorry, that is not a valid username or password</p>
-            {% endif %}
-              <label for="username">User name:</label>
-              <input type="text" name="username" id="username">
-              <label for="password">Password:</label>
-              <input type="password" name="password" id="password">
-          
-              <input type="submit" value="login" action="http://mysite.com/accounts/login/" />{% csrf_token %}
-              <input type="hidden" name="next" value="{{ next|escape }}" />
-            </form> -->
       </nav>
     </div>
   </header>

@@ -1,0 +1,14 @@
+<!-- templates/registration/index.html -->
+{% extends 'autotext/base.html' %} {% block content %}
+
+<div class="container">
+  {% if user.is_authenticated %} {%if reference_set is not None %}
+  <span class="input-group-addon glyphicon glyphicon-search"></span>
+  <span>{{ reference_set }}</span>
+  > {%endif%} {% else %}
+  <span>Not connected</span>
+
+  {% endif %}
+</div>
+
+{% endblock %}

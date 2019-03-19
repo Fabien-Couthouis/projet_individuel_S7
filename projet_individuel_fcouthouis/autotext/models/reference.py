@@ -7,42 +7,59 @@ from django.db import models
 
 
 class Reference(models.Model):
-
     url = models.URLField(max_length=400)
     _bibtex_reference = models.TextField(null=True,)
-    apa_reference = models.TextField(blank=True, null=True,)
-    _content = models.TextField(blank=True, null=True, editable=False)
-    # webography = models.ForeignKey("autotext.Webography")
+    _apa_reference = models.TextField(blank=True, null=True,)
     webography = models.ForeignKey(
         "Webography", on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
 
-    # Needs to be stored as a class variable
-    # language_detector = LanguageDetector()
-
     def __str__(self):
-        return "Reference : " + self.id + " with url : " + self.url
+        string = "Reference : " + str(self.id) + " with url : " + str(self.url)
+        return string
+
+    @property
+    def bibtex_reference(self):
+        if self._bibtex_reference is None:
+            self._bibtex_reference = self._get_bibtex_reference()
+            self.save()
+        return self._bibtex_reference
+
+    @bibtex_reference.setter
+    def bibtex_reference(self, value):
+        self._bibtex_reference = value
+
+    @property
+    def apa_reference(self):
+        if self._apa_reference is None:
+            self._apa_reference = self._get_formatted_reference('apa')
+            self.save()
+
+        return self._apa_reference
+
+    @apa_reference.setter
+    def apa_reference(self, value):
+        self._apa_reference = value
 
     def _retrieve_content(self):
-        """Get the raw content of the article (html or text). """
+        """Get the raw content of the article (html or binaries from pdf). """
         raise NotImplementedError(
             'subclasses must override _retrieve_content()!')
 
-    def get_bibtex_reference(self):
+    def _get_bibtex_reference(self):
         """
         Get the bibtex reference. Returns a string.
         """
         raise NotImplementedError(
             'subclasses must override get_bibtext_reference()!')
 
-    def get_formatted_reference(self, formatStyle='apa'):
+    def _get_formatted_reference(self, formatStyle='apa'):
         """
         Get the reference formatted into one of the possible formats.
         FormatStyle can be 'alpha', 'plain', 'unsrt', 'unsrtalpha' or 'apa'. Default = 'apa'.
         """
-        bibref = self.get_bibtex_reference()
 
         pybtex_style = pybtex.plugin.find_plugin(
             'pybtex.style.formatting', formatStyle)()
@@ -50,7 +67,7 @@ class Reference(models.Model):
             'pybtex.backends', 'text')()
         pybtex_parser = pybtex.database.input.bibtex.Parser()
 
-        data = pybtex_parser.parse_stream(six.StringIO(bibref))
+        data = pybtex_parser.parse_stream(six.StringIO(self.bibtex_reference))
         data_formatted = pybtex_style.format_entries(
             six.itervalues(data.entries))
         output = io.StringIO()
