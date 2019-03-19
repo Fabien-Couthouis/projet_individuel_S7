@@ -14,7 +14,8 @@ def index(request):
         # check whether it's valid:
         if form.is_valid():
             data = form.cleaned_data
-            webographie = Webography(data['urlList'])
+            webographie = Webography(raw_urls=data['urlList'])
+            webographie.save()
             webographie.generate_articles()
 
             formatStyle = form.cleaned_data.get('format_style')

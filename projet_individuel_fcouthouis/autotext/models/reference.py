@@ -4,7 +4,6 @@ import io
 import pybtex.database.input.bibtex
 import six
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Reference(models.Model):
@@ -13,40 +12,37 @@ class Reference(models.Model):
     _bibtex_reference = models.TextField(null=True,)
     apa_reference = models.TextField(blank=True, null=True,)
     _content = models.TextField(blank=True, null=True, editable=False)
-    webography = GenericForeignKey("autotext.Webography")
-    # webography = models.ForeignKey("Webography", on_delete=models.CASCADE, related_name="webography_references")
+    # webography = models.ForeignKey("autotext.Webography")
+    webography = models.ForeignKey(
+        "Webography", on_delete=models.CASCADE)
 
-    # class Meta:
-    #     abstract = True
+    class Meta:
+        abstract = True
 
     # Needs to be stored as a class variable
     # language_detector = LanguageDetector()
 
     def __str__(self):
-        return self.url
+        return "Reference : " + self.id + " with url : " + self.url
 
-    def _get_content(self):
+    def _retrieve_content(self):
         """Get the raw content of the article (html or text). """
-        raise NotImplementedError('subclasses must override get_content()!')
+        raise NotImplementedError(
+            'subclasses must override _retrieve_content()!')
 
-    @property
-    def bibtex_reference(self):
+    def get_bibtex_reference(self):
         """
         Get the bibtex reference. Returns a string.
         """
         raise NotImplementedError(
             'subclasses must override get_bibtext_reference()!')
 
-    @bibtex_reference.setter
-    def bibtex_reference(self, value):
-        self._bibtex_reference = value
-
     def get_formatted_reference(self, formatStyle='apa'):
         """
         Get the reference formatted into one of the possible formats.
         FormatStyle can be 'alpha', 'plain', 'unsrt', 'unsrtalpha' or 'apa'. Default = 'apa'.
         """
-        bibref = self.bibtex_reference()
+        bibref = self.get_bibtex_reference()
 
         pybtex_style = pybtex.plugin.find_plugin(
             'pybtex.style.formatting', formatStyle)()

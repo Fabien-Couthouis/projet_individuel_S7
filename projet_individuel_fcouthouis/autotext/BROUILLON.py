@@ -1,6 +1,6 @@
-icons = {
-    'username': "fa fa-user",
-    'password1': "fa fa-lock",
-    'password2': "fa fa-lock",
-}
-print(icons['username'])
+la = [1, 2, 3, 4]
+lb = [5, 6]
+
+
+for i in la + lb:
+    print(i)

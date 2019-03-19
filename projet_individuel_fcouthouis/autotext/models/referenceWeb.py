@@ -13,29 +13,31 @@ class ReferenceWeb(Reference):
     #     super().__init__(url)
     #     self._content = self._get_content()
 
-    def _get_content(self):
+    def _retrieve_content(self):
         """
         Attempts to get the content at `url` by making an HTTP GET request.
         If the content-type of response is some kind of HTML/XML, return the
         text content, otherwise return None. Inspired from https://www.crummy.com/software/BeautifulSoup/bs4/doc/#
         """
-        try:
-            with closing(get(self.url, stream=True)) as resp:
-                if self._is_good_response(resp):
-                    rawContent = resp.content
-                    formattedContent = BeautifulSoup(
-                        rawContent, 'html.parser')
+        if self._content is None:
+            try:
+                with closing(get(self.url, stream=True)) as resp:
+                    if self._is_good_response(resp):
+                        rawContent = resp.content
+                        formattedContent = BeautifulSoup(
+                            rawContent, 'html.parser')
 
-                    self._content = formattedContent
+                        self._content = formattedContent
 
-                    return self._content
-                else:
-                    return None
+                    else:
+                        return None
 
-        except RequestException as e:
-            self.log_error(
-                'Error during requests to {0} : {1}'.format(self.url, str(e)))
-            return None
+            except RequestException as e:
+                self.log_error(
+                    'Error during requests to {0} : {1}'.format(self.url, str(e)))
+                return None
+
+        return self._content
 
     def _is_good_response(self, resp):
         """
@@ -149,19 +151,21 @@ class ReferenceWeb(Reference):
 
         return metaContent
 
-    @property
-    def bibtex_reference(self):
-        author = self.get_author_name()
-        title = self.get_title()
-        pubDate = self.get_publication_date()
-        # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
-        bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
-                  ).format(author=author,
-                           title=title,
-                           url=self.url,
-                           year=pubDate.strftime("%Y"),
-                           month=pubDate.strftime("%B"),
-                           note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
+    def get_bibtex_reference(self):
+        self._get_content()
+        # Set _bibtex_reference value if null
+        if self._bibtex_reference is None:
+            author = self.get_author_name()
+            title = self.get_title()
+            pubDate = self.get_publication_date()
+            # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
+            bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
+                      ).format(author=author,
+                               title=title,
+                               url=self.url,
+                               year=pubDate.strftime("%Y"),
+                               month=pubDate.strftime("%B"),
+                               note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
 
-        self.bibtex_reference = bibRef
-        return self.bibtex_reference
+            self._bibtex_reference = bibRef
+        return self._bibtex_reference

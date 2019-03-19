@@ -5,26 +5,25 @@ from django.contrib.auth import get_user_model
 
 from .referenceWeb import ReferenceWeb
 from .referencePDF import ReferencePDF
+from pprint import pprint
 
 
 class Webography(models.Model):
-    class Meta:
-        db_table = 'Webography'
-
-    _raw_urls = models.TextField(null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user_references")
+    raw_urls = models.TextField(null=True)
+    user = models.ForeignKey(
+        get_user_model(), null=True, on_delete=models.CASCADE, related_name="user_references")
 
     # references = models.ManyToManyField(Reference)
 
     # def __init__(self, _raw_urls_string):
-    #     self._raw_urls = _raw_urls_string
+    #     self.raw_urls = _raw_urls_string
     #     self.articles = []
 
     def get_structurated_urls_list(self):
-        """Get a structurated list of urls from the _raw_urls string"""
+        """Get a structurated list of urls from the raw_urls string"""
         extractor = URLExtract()
         # Return [] if no url is present in raw_url_list(and not [""])
-        structured_urls = extractor.find_urls(self._raw_urls)
+        structured_urls = extractor.find_urls(self.raw_urls)
 
         # Multiple occurence suppression by passing structured_url_list into a set
         structured_urls = list(set(structured_urls))
@@ -34,32 +33,43 @@ class Webography(models.Model):
     def generate_articles(self):
         """Generate the list of articles in self.articles. Each article corresponds to one url."""
         structured_urls = self.get_structurated_urls_list()
+        this = Webography.objects.filter(id=self.id)[0]
+        # for attr in dir(this):
+        #     if hasattr(this, attr):
+        #         print("obj.%s = %s" % (attr, getattr(this, attr)))
         for url in structured_urls:
             r = requests.get(url)
             content_type = r.headers['Content-Type'].lower()
 
             if 'application/pdf' in content_type:
-                ref = ReferencePDF(url)
+                ref = ReferencePDF(url=url, webography=self)
+                ref.save()
+                this.referencepdf_set.add(ref)
             elif 'text/html' in content_type:
-                ref = ReferenceWeb(url)
+                ref = ReferenceWeb(url=url, webography=self)
+                ref.save()
+                this.referenceweb_set.add(ref)
             else:
                 ref = None
 
-            # self.webography_references.add(ref)
-            Webography.objects.get(self).webography_references.add(ref)
-            # Reference.objects.filter().add(ref)
-
     def get_bibtex_webography(self):
         bib_webography = []
-        # for ref in self.
-        #     bib_ref = ref.get_bibtex_reference()
-        #     bib_webography.append(bib_ref)
+        this = Webography.objects.get(id=self.id)
+        for ref in this.referencepdf_set.all(), this.referenceweb_set.all():
+            bib_ref = ref.get_bibtex_reference()
+            bib_webography.append(bib_ref)
 
         return bib_webography
 
     def get_formatted_webography(self, style='apa'):
         formatted_webography = []
-        # for ref in self.references:
+        this = Webography.objects.get(id=self.id)
+        for ref in this.referencepdf_set.all():
+            formatted_ref = ref.get_formatted_reference(style)
+            formatted_webography.append(formatted_ref)
+
+        # for ref in this.referenceweb_set.all():
+        #     print(2)
         #     formatted_ref = ref.get_formatted_reference(style)
         #     formatted_webography.append(formatted_ref)
 
