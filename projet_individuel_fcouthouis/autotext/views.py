@@ -1,10 +1,17 @@
+from django.views.generic import CreateView
 from django.shortcuts import render, redirect
 from .forms import PostUrlListForm
 from .forms import SignUpForm
-from .forms import WebographyForm
+from .forms import ReferenceForm
 from .models.webography import Webography
+from .models.referencePDF import ReferencePDF
+from .models.referenceWeb import ReferenceWeb
+
+
 from django.contrib.auth import login, authenticate
 from itertools import chain
+from django.template import loader
+from django.http import HttpResponse
 
 
 def index(request):
@@ -15,9 +22,9 @@ def index(request):
         # check whether it's valid:
         if form.is_valid():
             data = form.cleaned_data
-            webographie = Webography(raw_urls=data['urlList'])
-            webographie.save()
-            webographie.generate_articles()
+            webography = Webography(raw_urls=data['urlList'])
+            webography.save()
+            webography.generate_articles()
 
             formatStyle = form.cleaned_data.get('format_style')
             if formatStyle == 'APA':
@@ -53,20 +60,69 @@ def myReferences(request):
     if not request.user.is_authenticated:
         return redirect('/accounts/login')
     else:
-        if request.method == 'POST':
-            form = WebographyForm(request.POST)
-            if form.is_valid():
-                form.save()
+        template = loader.get_template('autotext/myReferences.html')
+        webography = Webography.objects.filter(user=request.user)[0]
+        referencepdf_set = webography.referencepdf_set.all()
+        referenceweb_set = webography.referenceweb_set.all()
+        # # Chain the sets
+        reference_set = list(
+            chain(referencepdf_set, referenceweb_set))
 
-                referencepdf_set = Webography.objects.get(
-                    user=request.user).referencepdf_set.all()
-                referenceweb_set = Webography.objects.get(
-                    user=request.user).referenceweb_set.all()
+        # reference_set = []
 
-                reference_set = list(
-                    chain(referencepdf_set, referenceweb_set))
+        # # Pass the webography in session
+        request.session['webographyId'] = webography.id
 
-                return render(request, 'autotext/myReferences.html', {'form': form, 'reference_set': reference_set})
-        else:
-            form = WebographyForm()
-            return render(request, 'autotext/myReferences.html', {'form': form})
+        add_ref_form = ReferenceForm()
+        context = {
+            'reference_set': reference_set,
+            'add_ref_form': add_ref_form
+        }
+        return HttpResponse(template.render(context, request))
+
+
+def addReference(request):
+    if request.method == 'POST':
+        form = ReferenceForm(request.POST)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            webography_id = request.session['webographyId']
+            webography = Webography.objects.get(id=webography_id)
+            url = data["url"]
+            bibtex_reference = data["bibtex_reference"]
+            apa_reference = data["apa_reference"]
+
+            webography.add_reference(
+                url=url, apa_reference=apa_reference, bibtex_reference=bibtex_reference)
+
+    return redirect("/myReferences")
+
+
+def editReference(request):
+    if request.method == 'POST':
+        form = ReferenceForm(request.POST)
+        print('EDITEDDD')
+
+        if form.is_valid():
+
+            ref_data = request.POST.get("edit_ref")
+            ref_id = ref_data.split(";")[0]
+            ref_classtype = ref_data.split(";")[1]
+            if "ReferencePDF" in ref_classtype:
+                reference = ReferencePDF.objects.get(id=ref_id)
+            else:
+                reference = ReferenceWeb.objects.get(id=ref_id)
+
+            data = form.cleaned_data
+            print(reference)
+            print(data["bibtex_reference"])
+            reference.url = data["url"]
+            reference.bibtex_reference = data["bibtex_reference"]
+            reference.apa_reference = data["apa_reference"]
+
+            print(reference.bibtex_reference)
+
+            reference.save()
+
+    return redirect("/myReferences")

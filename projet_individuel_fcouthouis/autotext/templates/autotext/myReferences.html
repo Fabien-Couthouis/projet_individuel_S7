@@ -1,14 +1,99 @@
-<!-- templates/registration/index.html -->
-{% extends 'autotext/base.html' %} {% block content %}
+<!-- templates/autotext/myReferences.html -->
 
+{% extends 'autotext/base.html' %} {% block content %} 
 <div class="container">
-  {% if user.is_authenticated %} {%if reference_set is not None %}
-  <span class="input-group-addon glyphicon glyphicon-search"></span>
-  <span>{{ reference_set }}</span>
-  > {%endif%} {% else %}
-  <span>Not connected</span>
+  {% if user.is_authenticated %}
+  <button class="btn btn-lg" data-toggle="modal" data-target="#addRefModal">
+    <i title="Ajouter une référence" class="fa fa-2x fa-plus-circle"></i>
+  </button>
 
+  {%if reference_set is not None %}
+
+  <table class="table table-hover table-responsive-xl">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Url</th>
+        <th scope="col">Bibtex</th>
+        <th scope="col">Apa</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ref in reference_set %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td class="apa_reference">
+          <button
+            title="Copier dans le presse papier"
+            class="url_copy_btn btn"
+            onclick="copyRefToClipBoard('{{ forloop.counter0 }}','url')"
+          >
+            <i class="fa fa-clipboard"></i>
+          </button>
+          {{ ref.url }}
+        </td>
+        <td class="bibtex_reference">
+          <button
+            title="Copier dans le presse papier"
+            class="bibtex_copy_btn btn"
+            onclick="copyRefToClipBoard('{{ forloop.counter0 }}', 'bibtex')"
+          >
+            <i class="fa fa-clipboard"></i>
+          </button>
+          {{ ref.bibtex_reference }}
+        </td>
+        <td class="apa_reference">
+          <button
+            title="Copier dans le presse papier"
+            class="apa_copy_btn btn"
+            onclick="copyRefToClipBoard('{{ forloop.counter0 }}','apa')"
+          >
+            <i class="fa fa-clipboard"></i>
+          </button>
+          {{ ref.apa_reference }}
+        </td>
+        <td>
+          <button
+            class="btn btn-lg"
+            data-toggle="modal" data-target="#editRefModal{{ref.id}}"
+          >
+            <i title="Modifier la référence" class="fa-lg fa fa-edit"></i>
+          </button>
+        </td>
+      </tr>
+      <!-- Modal edit form -->
+      <div
+        class="modal fade"
+        id="editRefModal{{ref.id}}"
+        tabindex="-1"
+        role="dialog"
+        aria-hidden="false"
+      >
+        {% include "./reference_form.html" with webography=webography form=add_ref_form ref=ref %}
+      </div>
+      
+
+      {% endfor %}
+      
+    </tbody>
+  </table>
+    {%endif%}
   {% endif %}
-</div>
 
+  <!-- Modal add form -->
+  <div
+    class="modal fade"
+    id="addRefModal"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="false"
+  >
+    {% include "./reference_form.html" with webography=webography form=add_ref_form %}
+  </div>
+</div> <!--container -->
+<script
+  type="text/javascript"
+  src="static/autotext/scripts/myReferences.js"
+></script>
 {% endblock %}

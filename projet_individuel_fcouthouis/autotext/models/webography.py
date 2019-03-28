@@ -30,34 +30,35 @@ class Webography(models.Model):
 
         return structured_urls
 
+    def add_reference(self, url, bibtex_reference=None, apa_reference=None):
+        r = requests.get(url)
+        content_type = r.headers['Content-Type'].lower()
+        if 'application/pdf' in content_type:
+            ref = ReferencePDF(url=url, bibtex_reference=bibtex_reference,
+                               apa_reference=apa_reference, webography=self)
+            ref.save()
+            self.referencepdf_set.add(ref)
+        elif 'text/html' in content_type:
+            ref = ReferenceWeb(url=url, bibtex_reference=bibtex_reference,
+                               apa_reference=apa_reference, webography=self)
+            ref.save()
+            self.referenceweb_set.add(ref)
+        else:
+            raise ValueError
+
     def generate_articles(self):
         """Generate the list of articles in self.articles. Each article corresponds to one url."""
         structured_urls = self.get_structurated_urls_list()
-        this = Webography.objects.filter(id=self.id)[0]
         for url in structured_urls:
-            r = requests.get(url)
-            content_type = r.headers['Content-Type'].lower()
-
-            if 'application/pdf' in content_type:
-                ref = ReferencePDF(url=url, webography=self)
-                ref.save()
-                this.referencepdf_set.add(ref)
-            elif 'text/html' in content_type:
-                ref = ReferenceWeb(url=url, webography=self)
-                ref.save()
-                this.referenceweb_set.add(ref)
-            else:
-                ref = None
+            self.add_reference(url)
 
     def get_bibtex_webography(self):
         bib_webography = []
-        this = Webography.objects.get(id=self.id)
         # Parse the 2 reference_set
-        for ref in this.referencepdf_set.all():
+        for ref in self.referencepdf_set.all():
             bib_webography.append(ref.bibtex_reference)
 
-        for ref in this.referenceweb_set.all():
-            print(ref.bibtex_reference)
+        for ref in self.referenceweb_set.all():
             bib_webography.append(ref.bibtex_reference)
 
         return bib_webography
@@ -68,11 +69,9 @@ class Webography(models.Model):
 
         # Parse the 2 reference_set
         for ref in this.referencepdf_set.all():
-            print(ref)
             formatted_webography.append(ref.apa_reference)
 
         for ref in this.referenceweb_set.all():
-            print(ref)
             formatted_webography.append(ref.apa_reference)
 
         return formatted_webography

@@ -22,9 +22,10 @@ class Reference(models.Model):
 
     @property
     def bibtex_reference(self):
-        if self._bibtex_reference is None:
+        if self._bibtex_reference is None or self._bibtex_reference == "":
             self._bibtex_reference = self._get_bibtex_reference()
             self.save()
+
         return self._bibtex_reference
 
     @bibtex_reference.setter
@@ -33,7 +34,7 @@ class Reference(models.Model):
 
     @property
     def apa_reference(self):
-        if self._apa_reference is None:
+        if self._apa_reference is None or self._apa_reference == "":
             self._apa_reference = self._get_formatted_reference('apa')
             self.save()
 
@@ -61,22 +62,27 @@ class Reference(models.Model):
         FormatStyle can be 'alpha', 'plain', 'unsrt', 'unsrtalpha' or 'apa'. Default = 'apa'.
         """
 
-        pybtex_style = pybtex.plugin.find_plugin(
-            'pybtex.style.formatting', formatStyle)()
-        pybtex_html_backend = pybtex.plugin.find_plugin(
-            'pybtex.backends', 'text')()
-        pybtex_parser = pybtex.database.input.bibtex.Parser()
+        # Return "" if bibtex ref is not referenced, as we need bibtex ref to find apa reference
+        if self.bibtex_reference == "undefined" or self.bibtex_reference is None:
+            return "undefined"
+        else:
+            pybtex_style = pybtex.plugin.find_plugin(
+                'pybtex.style.formatting', formatStyle)()
+            pybtex_html_backend = pybtex.plugin.find_plugin(
+                'pybtex.backends', 'text')()
+            pybtex_parser = pybtex.database.input.bibtex.Parser()
 
-        data = pybtex_parser.parse_stream(six.StringIO(self.bibtex_reference))
-        data_formatted = pybtex_style.format_entries(
-            six.itervalues(data.entries))
-        output = io.StringIO()
-        pybtex_html_backend.write_to_stream(data_formatted, output)
+            data = pybtex_parser.parse_stream(
+                six.StringIO(self.bibtex_reference))
+            data_formatted = pybtex_style.format_entries(
+                six.itervalues(data.entries))
+            output = io.StringIO()
+            pybtex_html_backend.write_to_stream(data_formatted, output)
 
-        # We remove "\n" at the end of the output value
-        formatted_ref = output.getvalue().replace("\n", "")
+            # We remove "\n" at the end of the output value
+            formatted_ref = output.getvalue().replace("\n", "")
 
-        return formatted_ref
+            return formatted_ref
 
     # def get_language(self, text=""):
     #     nlp = spacy.load('en')
