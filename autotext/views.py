@@ -1,4 +1,3 @@
-from django.views.generic import CreateView
 from django.shortcuts import render, redirect
 from .forms import PostUrlListForm
 from .forms import SignUpForm
@@ -28,9 +27,9 @@ def index(request):
 
             formatStyle = form.cleaned_data.get('format_style')
             if formatStyle == 'APA':
-                webography_output = webographie.get_formatted_webography()
+                webography_output = webography.get_formatted_webography()
             else:
-                webography_output = webographie.get_bibtex_webography()
+                webography_output = webography.get_bibtex_webography()
             return render(request, 'autotext/index.html', {'form': form, 'webography_output': webography_output})
 
     # if a GET (or any other method) we'll create a blank form
@@ -102,27 +101,41 @@ def addReference(request):
 def editReference(request):
     if request.method == 'POST':
         form = ReferenceForm(request.POST)
-        print('EDITEDDD')
 
         if form.is_valid():
-
-            ref_data = request.POST.get("edit_ref")
-            ref_id = ref_data.split(";")[0]
-            ref_classtype = ref_data.split(";")[1]
-            if "ReferencePDF" in ref_classtype:
-                reference = ReferencePDF.objects.get(id=ref_id)
-            else:
-                reference = ReferenceWeb.objects.get(id=ref_id)
+            reference = get_ref_object(request, "edit_ref")
 
             data = form.cleaned_data
-            print(reference)
-            print(data["bibtex_reference"])
             reference.url = data["url"]
             reference.bibtex_reference = data["bibtex_reference"]
             reference.apa_reference = data["apa_reference"]
 
-            print(reference.bibtex_reference)
-
             reference.save()
 
     return redirect("/myReferences")
+
+
+def deleteReference(request):
+    if request.method == 'POST':
+        reference = get_ref_object(request, "delete_ref")
+        reference.delete()
+    return redirect("/myReferences")
+
+
+def get_ref_object(request, action):
+    ref_data = request.POST.get(action)
+
+    if not ref_data:
+        return None
+
+    ref_id = ref_data.split(";")[0]
+    ref_classtype = ref_data.split(";")[1]
+
+    if "ReferencePDF" in ref_classtype:
+        reference = ReferencePDF.objects.get(id=ref_id)
+    elif "ReferenceWeb" in ref_classtype:
+        reference = ReferenceWeb.objects.get(id=ref_id)
+    else:
+        reference = None
+
+    return reference

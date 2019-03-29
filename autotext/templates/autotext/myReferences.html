@@ -1,6 +1,7 @@
 <!-- templates/autotext/myReferences.html -->
 
 {% extends 'autotext/base.html' %} {% block content %} 
+{% load util %}
 <div class="container">
   {% if user.is_authenticated %}
   <button class="btn btn-lg" data-toggle="modal" data-target="#addRefModal">
@@ -60,6 +61,16 @@
           >
             <i title="Modifier la référence" class="fa-lg fa fa-edit"></i>
           </button>
+
+          <form method="post" action="/myReferences/deleteReference">
+          {% csrf_token %}
+            <button
+            class="btn btn-lg" type="submit" name="delete_ref" value="{{ref.id}};{{ref|get_type}}"
+            >
+            <i title="Supprimer la référence" class="fa-lg fa fa-trash"></i>
+          </button>
+          </form>
+
         </td>
       </tr>
       <!-- Modal edit form -->
