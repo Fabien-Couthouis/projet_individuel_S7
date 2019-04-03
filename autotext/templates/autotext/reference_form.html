@@ -1,4 +1,4 @@
-<!-- templates/autotext/addReferenceForm.html -->
+<!-- templates/autotext/reference_form.html -->
 {% load util %}
 <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -10,63 +10,89 @@
         {%endif%}
       </div>
       <div class="modal-body">
-        {%if ref%}
-          <form action="/myReferences/editReference" method="post">  
-        {%else%}
-          <form action="/myReferences/addReference" method="post">  
-        {%endif%}
-            {% csrf_token %}
-
-              <div class="input-group" title="Un URL n'est pas modifiable, veuillez créer une nouvelle référence et supprimer celle-ci si besoin.">
-                <div class="input-group-prepend" >
-                  <span class="input-group-text">
-                    <i class="fa fa-link"></i>
-                  </span>
-                </div>
-                {%if ref%}
-                  <input class="form-control" cols="40" type="url" id="id_url" name="url" value="{{ ref.url }}" 
-                  disabled="disabled">
-                {%else%}
-                  {{ form.url }} 
-                {%endif%}
-              </div>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">
-                    <i class="fa fa-book"></i>
-                  </span>
-                </div>
-                {%if ref%}
-                  <textarea class="form-control" type="bibtex_reference" rows="10" cols="40" id="id_bibtex_reference" name="bibtex_reference">{{ ref.bibtex_reference }}</textarea>
-                {%else%}
-                  {{ form.bibtex_reference }} 
-                {%endif%}
-              </div>
+        {%if manyRef%}
+          <form action="/myReferences/addManyReferences" method="post">  
+          {% csrf_token %}
               <div class="input-group">
                   <div class="input-group-prepend">
                     <span class="input-group-text">
                       <i class="fa fa-book"></i>
                     </span>
                   </div>
-                  {%if ref%}
-                  <textarea class="form-control" type="apa_reference" rows="10" cols="40" id="id_apa_reference" name="apa_reference">{{ ref.apa_reference }}</textarea>
-                  {%else%}
-                    {{ form.apa_reference }} 
-                  {%endif%}
+                  {{ references_form.urlList }} 
                 </div>
                 <br/>
             
                 <div class="modal-footer">
-                {%if ref%}
-                  <button type="submit" name="edit_ref" value="{{ref.id}};{{ref|get_type}}" class="btn btn-lg btn-block btn-dark btn-labeled">
-                      <i class="btn-label fa fa-edit"></i>
-                    Modifier
-                  </button>
-                {%else%}
                   <button type="submit" name="add_ref" value="new_ref" class="btn btn-lg btn-block btn-dark btn-labeled">
                       <i class="btn-label fa fa-plus-circle"></i>
-                    Ajouter
+                    Ajouter 
                   </button>
+                  
+                </div>
+              </div>
+
+        {%else%}
+          {%if ref%}
+            <form action="/myReferences/editReference" method="post">  
+          {%else%}
+            <form action="/myReferences/addReference" method="post">  
+          {%endif%}
+              {% csrf_token %}
+              
+
+
+                <div class="input-group" title="Un URL n'est pas modifiable, veuillez créer une nouvelle référence et supprimer celle-ci si besoin.">
+                  <div class="input-group-prepend" >
+                    <span class="input-group-text">
+                      <i class="fa fa-link"></i>
+                    </span>
+                  </div>
+                  {%if ref%}
+                    <input class="form-control" cols="40" type="url" id="id_url" name="url" value="{{ ref.url }}" 
+                    disabled="disabled">
+                  {%else%}
+                    {{ form.url }} 
+                  {%endif%}
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-book"></i>
+                    </span>
+                  </div>
+                  {%if ref%}
+                    <textarea class="form-control" type="bibtex_reference" rows="10" cols="40" id="id_bibtex_reference" name="bibtex_reference">{{ ref.bibtex_reference }}</textarea>
+                  {%else%}
+                    {{ form.bibtex_reference }} 
+                  {%endif%}
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="fa fa-book"></i>
+                      </span>
+                    </div>
+                    {%if ref%}
+                    <textarea class="form-control" type="apa_reference" rows="10" cols="40" id="id_apa_reference" name="apa_reference">{{ ref.apa_reference }}</textarea>
+                    {%else%}
+                      {{ form.apa_reference }} 
+                    {%endif%}
+                  </div>
+                  <br/>
+              
+                  <div class="modal-footer">
+                  {%if ref%}
+                    <button type="submit" name="edit_ref" value="{{ref.id}};{{ref|get_type}}" class="btn btn-lg btn-block btn-dark btn-labeled">
+                        <i class="btn-label fa fa-edit"></i>
+                      Modifier
+                    </button>
+                  {%else%}
+                    <button type="submit" name="add_ref" value="new_ref" class="btn btn-lg btn-block btn-dark btn-labeled">
+                        <i class="btn-label fa fa-plus-circle"></i>
+                      Ajouter
+                    </button>
+                  {%endif%}
                 {%endif%}
                   
                 </div>

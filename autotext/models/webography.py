@@ -9,21 +9,30 @@ from pprint import pprint
 
 
 class Webography(models.Model):
-    raw_urls = models.TextField(null=True)
+    # raw_urls = models.TextField(null=True)
+    _name = models.TextField(null=True, default="")
     user = models.ForeignKey(
         get_user_model(), null=True, on_delete=models.CASCADE, related_name="user_references")
 
-    # references = models.ManyToManyField(Reference)
+    def __str__(self):
+        return str(self.name)
 
-    # def __init__(self, _raw_urls_string):
-    #     self.raw_urls = _raw_urls_string
-    #     self.articles = []
+    @property
+    def name(self):
+        if self._name == "" or self._name == None:
+            return "Webography n°" + str(self.id)
+        else:
+            return self._name
 
-    def get_structurated_urls_list(self):
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    def get_structurated_urls(self, raw_urls):
         """Get a structurated list of urls from the raw_urls string"""
         extractor = URLExtract()
         # Return [] if no url is present in raw_url_list(and not [""])
-        structured_urls = extractor.find_urls(self.raw_urls)
+        structured_urls = extractor.find_urls(raw_urls)
 
         # Multiple occurence suppression by passing structured_url_list into a set
         structured_urls = list(set(structured_urls))
@@ -46,9 +55,9 @@ class Webography(models.Model):
         else:
             raise ValueError
 
-    def generate_articles(self):
-        """Generate the list of articles in self.articles. Each article corresponds to one url."""
-        structured_urls = self.get_structurated_urls_list()
+    def add_refererences_from_urls(self, raw_urls):
+        """Generate the list of references from a list of urls. Each article corresponds to one url."""
+        structured_urls = self.get_structurated_urls(raw_urls)
         for url in structured_urls:
             self.add_reference(url)
 

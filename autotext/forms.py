@@ -8,7 +8,17 @@ from .models.referencePDF import ReferencePDF
 from .models.webography import Webography
 
 
-class PostUrlListForm(forms.Form):
+class UrlListForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for myField in self.fields:
+            self.fields[myField].widget.attrs['class'] = 'form-control'
+
+    urlList = forms.CharField(
+        widget=forms.Textarea())
+
+
+class IndexForm(UrlListForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for myField in self.fields:
@@ -18,9 +28,6 @@ class PostUrlListForm(forms.Form):
         ('APA', 'APA'),
         ('BIB', 'BIBTEX'),
     ]
-
-    urlList = forms.CharField(
-        widget=forms.Textarea())
 
     format_style = forms.ChoiceField(
         required=False,
@@ -51,10 +58,19 @@ class SignUpForm(UserCreationForm):
         fields = UserCreationForm.Meta.fields
 
 
-class WebographyForm(ModelForm):
-    class Meta:
-        model = Webography
-        fields = ['raw_urls', 'user']
+class WebographyForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        # Retirve user
+        user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+        for myField in self.fields:
+            self.fields[myField].widget.attrs['class'] = 'form-control'
+
+        self.fields['webography'] = forms.ModelChoiceField(
+            required=False, queryset=Webography.objects.filter(user=user))
+
+    name = forms.CharField(required=False,
+                           widget=forms.TextInput(attrs={'placeholder': 'Nom'}))
 
 
 class ReferenceForm(forms.Form):

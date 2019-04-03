@@ -11,6 +11,14 @@ urlpatterns = [
     path('myReferences/editReference', views.editReference, name='editReference'),
     path('myReferences/deleteReference',
          views.deleteReference, name='deleteReference'),
+    path('myReferences/addManyReferences',
+         views.addManyReferences, name='addManyReferences'),
+    path('myReferences/setWebography', views.setWebography, name='setWebography'),
+    path('myReferences/addWebography', views.addWebography, name='addWebography'),
+    path('myReferences/editWebography',
+         views.editWebography, name='editWebography'),
+    path('myReferences/deleteWebography',
+         views.deleteWebography, name='deleteWebography'),
 
 
 

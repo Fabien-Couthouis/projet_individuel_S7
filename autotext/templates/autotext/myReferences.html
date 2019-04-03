@@ -4,13 +4,58 @@
 {% load util %}
 <div class="container">
   {% if user.is_authenticated %}
-  <button class="btn btn-lg" data-toggle="modal" data-target="#addRefModal">
-    <i title="Ajouter une référence" class="fa fa-2x fa-plus-circle"></i>
+
+
+  {%if no_webography%}
+  <button class="btn btn-lg text-right" data-toggle="modal" data-target="#addWebModal">
+      <i title="Ajouter une webographie" class="fa fa-plus-circle"></i> Créer votre première webographie !
+    </button>
+
+  {%else%}
+  <div class="row">
+    <button class="btn btn-lg text-right" data-toggle="modal" data-target="#addWebModal">
+      <i title="Ajouter une webographie" class="fa fa-plus-circle"></i>
+    </button>
+    
+    <form class="form-inline" action="myReferences/setWebography" method="post">
+        {% csrf_token %}
+
+        <select class="form-control" name="webography" onChange="this.form.submit();">
+        {% for web in webography_form.webography.field.queryset %}
+          <option 
+          {%if request.session.webography_id == web.id%}
+            selected
+          {% endif %}
+          value="{{web.id}}">{{web.name}}</option>
+          {% endfor %}
+        </select>
+    </form>
+
+    
+        
+      <button class="btn btn-lg" data-toggle="modal" data-target="#editWebModal">
+        <i title="Renommer la webographie" class="fa fa-edit"></i>
+      </button>
+      <form class="" action="myReferences/deleteWebography" method="post">
+      {% csrf_token %}
+        <button class="btn btn-lg" type="submit">
+          <i title="Supprimer la webographie" class="fa fa-trash"></i>
+        </button>
+      </form>
+  </div>
+
+
+
+  <button class="float-right btn btn-lg" data-toggle="modal" data-target="#addRefModal">
+    <i title="Ajouter une référence" class="fa fa-2x fa-book"></i>
+  </button>
+  <button class="float-right btn btn-lg" data-toggle="modal" data-target="#addManyRefModal">
+    <i title="Ajouter plusieurs références" class="fa fa-2x fa-plus-circle"></i>
   </button>
 
   {%if reference_set is not None %}
 
-  <table class="table table-hover table-responsive-xl">
+  <table class="table table-hover table-responsive-xl text-center">
     <thead class="thead-dark">
       <tr>
         <th scope="col">#</th>
@@ -24,35 +69,35 @@
       {% for ref in reference_set %}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
-        <td class="apa_reference">
+        <td class="url_reference">
           <button
-            title="Copier dans le presse papier"
+            title="Cliquez-moi pour me copier dans votre presse papier !"
             class="url_copy_btn btn"
             onclick="copyRefToClipBoard('{{ forloop.counter0 }}','url')"
           >
-            <i class="fa fa-clipboard"></i>
+            {{ ref.url }}
           </button>
-          {{ ref.url }}
+          
         </td>
         <td class="bibtex_reference">
           <button
-            title="Copier dans le presse papier"
+            title="Cliquez-moi pour me copier dans votre presse papier !"
             class="bibtex_copy_btn btn"
             onclick="copyRefToClipBoard('{{ forloop.counter0 }}', 'bibtex')"
           >
-            <i class="fa fa-clipboard"></i>
+            {{ ref.bibtex_reference }}
           </button>
-          {{ ref.bibtex_reference }}
+          
         </td>
         <td class="apa_reference">
           <button
-            title="Copier dans le presse papier"
+            title="Cliquez-moi pour me copier dans votre presse papier !"
             class="apa_copy_btn btn"
             onclick="copyRefToClipBoard('{{ forloop.counter0 }}','apa')"
           >
-            <i class="fa fa-clipboard"></i>
+            {{ ref.apa_reference }}
           </button>
-          {{ ref.apa_reference }}
+          
         </td>
         <td>
           <button
@@ -73,7 +118,7 @@
 
         </td>
       </tr>
-      <!-- Modal edit form -->
+      <!-- Modal edit ref -->
       <div
         class="modal fade"
         id="editRefModal{{ref.id}}"
@@ -81,7 +126,7 @@
         role="dialog"
         aria-hidden="false"
       >
-        {% include "./reference_form.html" with webography=webography form=add_ref_form ref=ref %}
+        {% include "./reference_form.html" with webography=webography form=reference_form ref=ref %}
       </div>
       
 
@@ -91,8 +136,32 @@
   </table>
     {%endif%}
   {% endif %}
+  {% endif %}
 
-  <!-- Modal add form -->
+
+  <!-- Modal add webography -->
+  <div
+    class="modal fade"
+    id="addWebModal"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="false"
+  >
+    {% include "./webography_form.html" with form=webography_form edit=0%}
+  </div>
+
+  <!-- Modal edit webography -->
+  <div
+    class="modal fade"
+    id="editWebModal"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="false"
+  >
+    {% include "./webography_form.html" with form=webography_form edit=1%}
+  </div>
+
+  <!-- Modal add ref -->
   <div
     class="modal fade"
     id="addRefModal"
@@ -100,7 +169,22 @@
     role="dialog"
     aria-hidden="false"
   >
-    {% include "./reference_form.html" with webography=webography form=add_ref_form %}
+    {% include "./reference_form.html" with form=reference_form %}
+  </div>
+
+  <!-- Modal add manyref -->
+  <div
+    class="modal fade"
+    id="addManyRefModal"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="false"
+  >
+  {% include "./reference_form.html" with form=references_form manyRef=1%}
+  </div>
+  
+
+
   </div>
 </div> <!--container -->
 <script

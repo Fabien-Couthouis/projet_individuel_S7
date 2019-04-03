@@ -8,22 +8,37 @@
       <div class="input-group">
         {{ form.urlList }}
 
-        {%if webography_output is not None %}
-        <span class="input-group-addon glyphicon glyphicon-search"></span>
+        {%if webography_output %}
+        <div class="column">
+        {% comment %} <span class="input-group-addon glyphicon glyphicon-search"></span> {% endcomment %}
         <textarea class="col-md" rows="20" readonly
           >{{ webography_output }}
         </textarea>
+        <div><button class="btn btn-large btn-primary" data-toggle="modal" data-target="#editWebModal">Nouvelle webographie</button>
+        <button class="btn btn-large btn-primary" >Ajouter à une webographie</button></div>
+        
+
+        </div>
         {%endif%}
 
-        <div class="col-md">{{ form.generated_webography }}</div>
+        {% comment %} <div class="col-md">{{ form.generated_webography }}</div> {% endcomment %}
       </div>
+
+      <input type="radio" id="radio1" name="radios" value="all" checked>
+       <label for="radio1">iPhone</label>
+    <input type="radio" id="radio2" name="radios"value="false">
+       <label for="radio2">Galaxy S IV</label>
+    <input type="radio" id="radio3" name="radios" value="true">
+       <label for="radio3">Nexus S</label> 
 
       <div class="row">
         <label class="col-sm-1">
           Format :
         </label>
         {% for radio in form.format_style %}
-        <label class="radio-inline "> {{ radio }} </label><span> </span>
+        {{ choice.choice_label }}
+  <div class="select">{{ choice.tag }}</div> {# Or any other type you want. #}
+        {{ radio }}
         {% endfor %}
       </div>
       <br />
@@ -35,4 +50,17 @@
   </div>
 </div>
 <span class="glyphicon glyphicon-search"></span>
+
+
+  <!-- Modal edit webography -->
+  <div
+    class="modal fade"
+    id="editWebModal"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="false"
+  >
+    {% include "./webography_form.html" with form=webography_form edit=1%}
+  </div>
+
 {% endblock %}

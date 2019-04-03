@@ -1,0 +1,56 @@
+<!-- templates/autotext/webography_form.html -->
+{% load util %}
+<div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        {%if edit%}
+          <h3 class="modal-title" id="editWebModalLabel">Modifier le nom de ma webographie</h5>
+        {%else%}
+          <h3 class="modal-title" id="addWebModalLabel">Ajouter une webographie</h5>
+        {%endif%}
+      </div>
+      <div class="modal-body">
+        {%if edit%}
+          <form action="/myReferences/editWebography" method="post", autocomplete="off">  
+        {%else%}
+          <form action="/myReferences/addWebography" method="post", autocomplete="off">  
+        {%endif%}
+            {% csrf_token %}
+
+              <div class="input-group" title="Nom de la webographie.">
+                <div class="input-group-prepend" >
+                  <span class="input-group-text">
+                    <i class="fas fa-file-signature"></i>
+                  </span>
+                </div>
+                {%if edit%}
+                  <input class="form-control" cols="4" id="id_name" name="name" value="{{ request.session.webography_name }}" >
+                {%else%}
+                  {{ form.name }} 
+                {%endif%}
+              </div>
+
+              <br>
+              
+                {%if edit%}
+                  <button type="submit" name="edit_web" class="btn btn-lg btn-block btn-dark btn-labeled">
+                      <i class="btn-label fa fa-edit"></i>
+                    Modifier
+                  </button>
+                {%else%}
+                  <button type="submit" name="add_web" class="btn btn-lg btn-block btn-dark btn-labeled">
+                      <i class="btn-label fa fa-plus-circle"></i>
+                    Ajouter
+                  </button>
+                {%endif%}
+                  
+                </div>
+              </div>
+            
+            </form>           
+        
+      </div>
+    </div>
+  </div>
+  
+

@@ -1,29 +1,46 @@
 from django.shortcuts import render, redirect
-from .forms import PostUrlListForm
+from django.contrib.auth import login, authenticate
+from itertools import chain
+from django.template import loader
+from django.http import HttpResponse
+
+from .forms import UrlListForm
+from .forms import IndexForm
+
 from .forms import SignUpForm
 from .forms import ReferenceForm
+from .forms import WebographyForm
+
 from .models.webography import Webography
 from .models.referencePDF import ReferencePDF
 from .models.referenceWeb import ReferenceWeb
 
 
-from django.contrib.auth import login, authenticate
-from itertools import chain
-from django.template import loader
-from django.http import HttpResponse
+def set_to_session(request, webography):
+    ''' Set webography info into a session variable'''
+    request.session['webography_id'] = webography.id
+    request.session['webography_name'] = webography.name
+
+
+def get_webography_from_session(request):
+    webography_id = request.session['webography_id']
+    webography = Webography.objects.get(id=webography_id)
+    return webography
 
 
 def index(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = PostUrlListForm(request.POST)
+        form = IndexForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             data = form.cleaned_data
-            webography = Webography(raw_urls=data['urlList'])
+            webography = Webography()
             webography.save()
-            webography.generate_articles()
+            set_to_session(request, webography)
+            webography.add_refererences_from_urls(
+                raw_urls=data['urlList'])
 
             formatStyle = form.cleaned_data.get('format_style')
             if formatStyle == 'APA':
@@ -34,7 +51,7 @@ def index(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = PostUrlListForm()
+        form = IndexForm()
 
     return render(request, 'autotext/index.html', {'form': form})
 
@@ -60,24 +77,48 @@ def myReferences(request):
         return redirect('/accounts/login')
     else:
         template = loader.get_template('autotext/myReferences.html')
-        webography = Webography.objects.filter(user=request.user)[0]
+
+        if not request.session.get('webography_id', None):
+            webographies = Webography.objects.filter(user=request.user)
+            if webographies:
+                # Take first webography
+                webography = webographies[0]
+                set_to_session(request, webography)
+            else:
+                context = {
+                    'no_webography': 1,
+                    'webography_form': WebographyForm(user=request.user),
+                    'reference_form': ReferenceForm(),
+                    'references_form': UrlListForm()
+                }
+                return HttpResponse(template.render(context, request))
+
+        else:
+            webography = get_webography_from_session(request)
+
         referencepdf_set = webography.referencepdf_set.all()
         referenceweb_set = webography.referenceweb_set.all()
         # # Chain the sets
         reference_set = list(
             chain(referencepdf_set, referenceweb_set))
 
-        # reference_set = []
-
-        # # Pass the webography in session
-        request.session['webographyId'] = webography.id
-
-        add_ref_form = ReferenceForm()
         context = {
+            'webography_form': WebographyForm(user=request.user),
             'reference_set': reference_set,
-            'add_ref_form': add_ref_form
+            'reference_form': ReferenceForm(),
+            'references_form': UrlListForm()
         }
         return HttpResponse(template.render(context, request))
+
+
+def setWebography(request):
+    if request.method == 'POST':
+        form = WebographyForm(request.POST, user=request.user)
+
+        if form.is_valid():
+            set_to_session(request, form.cleaned_data["webography"])
+
+    return redirect('/myReferences')
 
 
 def addReference(request):
@@ -86,8 +127,7 @@ def addReference(request):
 
         if form.is_valid():
             data = form.cleaned_data
-            webography_id = request.session['webographyId']
-            webography = Webography.objects.get(id=webography_id)
+            webography = get_webography_from_session(request)
             url = data["url"]
             bibtex_reference = data["bibtex_reference"]
             apa_reference = data["apa_reference"]
@@ -139,3 +179,54 @@ def get_ref_object(request, action):
         reference = None
 
     return reference
+
+
+def addWebography(request):
+    if request.method == 'POST':
+        form = WebographyForm(request.POST, user=request.user)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            webography = Webography(name=data['name'], user=request.user)
+            webography.save()
+            set_to_session(request, webography)
+
+    return redirect("/myReferences")
+
+
+def editWebography(request):
+    if request.method == 'POST':
+        form = WebographyForm(request.POST, user=request.user)
+
+        if form.is_valid():
+            webography = get_webography_from_session(request)
+            data = form.cleaned_data
+            webography.name = data["name"]
+            webography.save()
+
+    return redirect("/myReferences")
+
+
+def deleteWebography(request):
+    print("o")
+    if request.method == 'POST':
+
+        webography_id = request.session.get('webography_id', None)
+
+        webography = Webography.objects.get(id=webography_id)
+        webography.delete()
+        # Reset session variable
+        del request.session['webography_id']
+    return redirect("/myReferences")
+
+
+def addManyReferences(request):
+    if request.method == 'POST':
+        form = UrlListForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            webography = get_webography_from_session(request)
+            webography.add_refererences_from_urls(
+                raw_urls=data['urlList'])
+
+    return redirect("/myReferences")

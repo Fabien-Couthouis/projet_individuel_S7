@@ -52,9 +52,9 @@ class ReferenceWeb(Reference):
         # Is one of them present in one of the elements below ?
         keyWords = ["by", "author"]
         metas = content.find_all('meta')
-        elementsToSearch = ['name', 'property']
+        elements = ['name', 'property']
 
-        name = self._get_meta_content(metas, elementsToSearch, keyWords)
+        name = self._get_meta_content(metas, elements, keyWords)
 
         if name == "":
             self.log_error("No author found for this url : " + self.url)
@@ -87,9 +87,9 @@ class ReferenceWeb(Reference):
         # Is one of them present in one of the elements below ?
         keyWords = ["title"]
         metas = content.find_all('meta')
-        elementsToSearch = ['property']
+        elements = ['property']
 
-        title = self._get_meta_content(metas, elementsToSearch, keyWords)
+        title = self._get_meta_content(metas, elements, keyWords)
 
         if title == "":
             self.log_error("No title found for this url : " + self.url)
@@ -99,37 +99,37 @@ class ReferenceWeb(Reference):
     def get_publication_date(self, content):
         keyWords = ["published"]
         metas = content.find_all('meta')
-        elementsToSearch = ['property']
+        elements = ['property']
 
-        publicationDate = self._get_meta_content(
-            metas, elementsToSearch, keyWords)
+        publication_date = self._get_meta_content(
+            metas, elements, keyWords)
 
         # Convert pubdate from string to datetime
-        formattedPublicationDate = self._format_publication_date(
-            publicationDate)
+        formatted_publication_date = self._format_publication_date(
+            publication_date)
 
-        if formattedPublicationDate == "":
+        if formatted_publication_date == "":
             self.log_error("No date found for this url : " + self.url)
 
-        return formattedPublicationDate
+        return formatted_publication_date
 
-    def _format_publication_date(self, isoStringPubDate):
+    def _format_publication_date(self, string_iso):
         """Convert string publication date into an exploitable datetime. """
         # We need to remove the ":" because '%z' in strptime doesnt requiere any ":" so that we do not get any error.
         # See https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior for more info.
-        isoStringPubDate = isoStringPubDate.replace(":", "")
-        # Remove utc info, sometimes the format differs and we do not care about hours
-        isoStringPubDate = isoStringPubDate[:17]
-        dt = datetime.strptime(isoStringPubDate, "%Y-%m-%dT%H%M%S")
+        string_iso = string_iso.replace(":", "")
+        # Remove utc info and hours, sometimes the format differs and we do not really care about hours
+        string_iso = string_iso.split("T")[0]
+        dt = datetime.strptime(string_iso, "%Y-%m-%d")
         return dt
 
-    def _get_meta_content(self, metas, elementsToSearch, keyWords):
+    def _get_meta_content(self, metas, elements, keyWords):
         """
         Use beautifulsoup to get content corresponding to the keywords in the given element, parsing meta tags into the htlm doc.
 
         Arguments:
             metas -- List of all meta tags in the html document.
-            elementsToSearch -- List of all elements in the meta tag wherein we want a keyword to be.
+            elements -- List of all elements in the meta tag wherein we want a keyword to be.
             keyWords -- List of keywords to search in the referenced elements.
      """
         i = 0
@@ -138,7 +138,7 @@ class ReferenceWeb(Reference):
         while (metaContent == "" and i < len(metas)):
             meta = metas[i]
 
-            for element in elementsToSearch:
+            for element in elements:
                 if not (meta.get(element) is None):
                     if any(keyWord in meta.get(element) for keyWord in keyWords):
                         metaContent = meta.get('content')
