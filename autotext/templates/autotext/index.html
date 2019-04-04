@@ -1,66 +1,67 @@
 <!-- templates/registration/index.html -->
 {% extends 'autotext/base.html' %} {% block content %}
-<div class="container">
-  <div class="row">
-    <form class="post-form col-md" method="post">
-      {% csrf_token %}
+<body class="index-body">
+  <div class="container index-container">
+    <div class="">
+      <form class="post-form col-md" method="post">
+        {% csrf_token %}
 
-      <div class="input-group">
-        {{ form.urlList }}
+        <div class="">
 
-        {%if webography_output %}
-        <div class="column">
-        {% comment %} <span class="input-group-addon glyphicon glyphicon-search"></span> {% endcomment %}
-        <textarea class="col-md" rows="20" readonly
-          >{{ webography_output }}
-        </textarea>
-        <div><button class="btn btn-large btn-primary" data-toggle="modal" data-target="#editWebModal">Nouvelle webographie</button>
-        <button class="btn btn-large btn-primary" >Ajouter à une webographie</button></div>
-        
+                
+
+          {%if webography_bib %}
+
+            <div class="index-tabs">
+              <div class="index-tab-2">
+                <label for="index-tab2-1">Bibtex</label>
+                <input id="index-tab2-1" name="index-tabs-two" type="radio" checked="checked">
+                <div class="row">
+                <textarea class="col-sm-5 form-control index-textarea" rows="15" type="urlList" id="id_urlList1" name="urlList">{{ form.urlList.value }}</textarea>   
+                  <textarea class="col-sm-5 form-control index-textarea" rows="20" readonly>{{ webography_bib }}
+                  </textarea>
+                </div>
+              </div>
+              <div class="index-tab-2">
+                <label for="index-tab2-2">Apa</label>
+                <input id="index-tab2-2" name="index-tabs-two" type="radio">
+                <div class="row">
+                <textarea class="col-sm-5 form-control index-textarea" rows="15" type="urlList" id="id_urlList2" name="urlList">{{ form.urlList.value }}</textarea>   
+                  <textarea class="col-sm-5 form-control col-md index-textarea" rows="20" readonly>{{ webography_apa }}
+                  </textarea>
+                </div>
+              </div>
+            </div>
+
+           
+            
+
+          {% comment %} </div> {% endcomment %}
+          {%endif%}
 
         </div>
-        {%endif%}
 
-        {% comment %} <div class="col-md">{{ form.generated_webography }}</div> {% endcomment %}
-      </div>
+        <br />
 
-      <input type="radio" id="radio1" name="radios" value="all" checked>
-       <label for="radio1">iPhone</label>
-    <input type="radio" id="radio2" name="radios"value="false">
-       <label for="radio2">Galaxy S IV</label>
-    <input type="radio" id="radio3" name="radios" value="true">
-       <label for="radio3">Nexus S</label> 
-
-      <div class="row">
-        <label class="col-sm-1">
-          Format :
-        </label>
-        {% for radio in form.format_style %}
-        {{ choice.choice_label }}
-  <div class="select">{{ choice.tag }}</div> {# Or any other type you want. #}
-        {{ radio }}
-        {% endfor %}
-      </div>
-      <br />
-
-      <button type="submit" class="btn btn-primary float-right">
-        Génerer ma webographie
-      </button>
-    </form>
+        <button type="submit" class="btn btn-primary float-right">
+          Génerer ma webographie
+        </button>
+      </form>
+    </div>
   </div>
-</div>
-<span class="glyphicon glyphicon-search"></span>
+  <span class="glyphicon glyphicon-search"></span>
 
 
-  <!-- Modal edit webography -->
-  <div
-    class="modal fade"
-    id="editWebModal"
-    tabindex="-1"
-    role="dialog"
-    aria-hidden="false"
-  >
-    {% include "./webography_form.html" with form=webography_form edit=1%}
-  </div>
+    <!-- Modal edit webography -->
+    <div
+      class="modal fade"
+      id="editWebModal"
+      index-tabindex="-1"
+      role="dialog"
+      aria-hidden="false"
+    >
+      {% include "./webography_form.html" with form=webography_form edit=1%}
+    </div>
+</body>
 
 {% endblock %}

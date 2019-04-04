@@ -42,12 +42,9 @@ def index(request):
             webography.add_refererences_from_urls(
                 raw_urls=data['urlList'])
 
-            formatStyle = form.cleaned_data.get('format_style')
-            if formatStyle == 'APA':
-                webography_output = webography.get_formatted_webography()
-            else:
-                webography_output = webography.get_bibtex_webography()
-            return render(request, 'autotext/index.html', {'form': form, 'webography_output': webography_output})
+            return render(request, 'autotext/index.html', {'form': form,
+                                                           'webography_apa': webography.get_formatted_webography(),
+                                                           'webography_bib': webography.get_bibtex_webography()})
 
     # if a GET (or any other method) we'll create a blank form
     else:

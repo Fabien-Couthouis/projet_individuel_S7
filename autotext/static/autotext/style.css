@@ -3,6 +3,49 @@
   padding: 20px 20px 20px 40px;
 }
 
+.index-body::after {
+  content: "";
+  background: url("images/background_index.jpg");
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  size: 100%;
+  z-index: -1;
+}
+.index-textarea {
+  outline: none;
+  background-color: rgba(219, 218, 218, 0.589);
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+}
+
+.index-textarea:focus {
+  outline: none;
+  background-color: rgba(219, 218, 218, 0.589);
+  -webkit-border-radius: 35px;
+  -moz-border-radius: 35px;
+  border-radius: 35px;
+}
+
+.myReferences-body::after {
+  content: "";
+  background: url("images/background_myReferences.jpg");
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  size: 100%;
+  z-index: -1;
+}
+
 .btn.btn-auth {
   background-color: rgb(104, 145, 162);
   padding: 0px;
@@ -54,31 +97,99 @@
   border-color: rgb(12, 83, 165);
 }
 
-/*
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-/* input[type="radio"] {
-  display: none;
-  margin: 10px;
+/* body {
+  background: #191828;
+  color: #efedef;
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  line-height: 1.6em;
+  margin: 0;
+  padding: 100px;
 } */
 
-/*
-Change the look'n'feel of labels (which are adjacent to radiobuttons).
-Add some margin, padding to label
-*/
-/* input[type="radio"] + label {
-  display: inline-block;
-  margin: -2px;
-  padding: 4px 12px;
-  background-color: #e7e7e7;
-  border-color: #ddd;
-} */
-/*
-Change background color for label next to checked radio button
-to make it look like highlighted button
-*/
-/* input[type="radio"]:checked + label {
-  background-image: none;
-  background-color: #d0d0d0;
-} */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+.index-tabs {
+  display: block;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -moz-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: 0;
+  overflow: hidden;
+}
+.index-tabs [class^="index-tab"] label,
+.index-tabs [class*=" index-tab"] label {
+  color: #efedef;
+  cursor: pointer;
+  display: block;
+  font-size: 1.1em;
+  font-weight: 300;
+  line-height: 1em;
+  padding: 2rem 0;
+  text-align: center;
+}
+.index-tabs [class^="index-tab"] [type="radio"],
+.index-tabs [class*=" index-tab"] [type="radio"] {
+  border-bottom: 1px solid rgba(239, 237, 239, 0.5);
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+.index-tabs [class^="index-tab"] [type="radio"]:hover,
+.index-tabs [class^="index-tab"] [type="radio"]:focus,
+.index-tabs [class*=" index-tab"] [type="radio"]:hover,
+.index-tabs [class*=" index-tab"] [type="radio"]:focus {
+  border-bottom: 1px solid hsl(32, 98%, 57%);
+}
+.index-tabs [class^="index-tab"] [type="radio"]:checked,
+.index-tabs [class*=" index-tab"] [type="radio"]:checked {
+  border-bottom: 2px solid hsl(32, 98%, 57%);
+}
+.index-tabs [class^="index-tab"] [type="radio"]:checked + div,
+.index-tabs [class*=" index-tab"] [type="radio"]:checked + div {
+  opacity: 1;
+}
+.index-tabs [class^="index-tab"] [type="radio"] + div,
+.index-tabs [class*=" index-tab"] [type="radio"] + div {
+  display: block;
+  opacity: 0;
+  padding: 2rem 0;
+  width: 90%;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+.index-tabs .index-tab-2 {
+  width: 50%;
+}
+.index-tabs .index-tab-2 [type="radio"] + div {
+  width: 200%;
+  margin-left: 200%;
+}
+.index-tabs .index-tab-2 [type="radio"]:checked + div {
+  margin-left: 0;
+}
+.index-tabs .index-tab-2:last-child [type="radio"] + div {
+  margin-left: 100%;
+}
+.index-tabs .index-tab-2:last-child [type="radio"]:checked + div {
+  margin-left: -100%;
+}

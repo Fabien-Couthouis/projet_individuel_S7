@@ -12,10 +12,10 @@ class UrlListForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for myField in self.fields:
-            self.fields[myField].widget.attrs['class'] = 'form-control'
+            self.fields[myField].widget.attrs['class'] = 'form-control '
 
-    urlList = forms.CharField(
-        widget=forms.Textarea())
+    urlList = forms.CharField(initial="",
+                              widget=forms.Textarea())
 
 
 class IndexForm(UrlListForm):
