@@ -1,48 +1,47 @@
 <!-- templates/autotext/myReferences.html -->
 
-{% extends 'autotext/base.html' %} {% block content %} 
+{% extends 'autotext/base.html' %} {% block content %}
 {% load util %}
+
 <body class="myReferences-body">
-  <div class="container">
+  <h3 class="text-center">Gérer mes webographies</h3>
+  <div class="container-fluid">
     {% if user.is_authenticated %}
 
 
     {%if no_webography%}
     <button class="btn btn-lg text-right" data-toggle="modal" data-target="#addWebModal">
-        <i title="Ajouter une webographie" class="fa fa-plus-circle"></i> Créer votre première webographie !
-      </button>
+      <i title="Ajouter une webographie" class="fa fa-plus-circle"></i> Créer votre première webographie !
+    </button>
 
     {%else%}
     <div class="row">
-      <button class="btn btn-lg text-right" data-toggle="modal" data-target="#addWebModal">
+      <button class="btn btn-lg" data-toggle="modal" data-target="#addWebModal">
         <i title="Ajouter une webographie" class="fa fa-plus-circle"></i>
       </button>
-      
-      <form class="form-inline" action="myReferences/setWebography" method="post">
-          {% csrf_token %}
 
-          <select class="form-control" name="webography" onChange="this.form.submit();">
+      <form class="col-4" action="myReferences/setWebography" method="post">
+        {% csrf_token %}
+
+        <select class="form-control " name="webography" onChange="this.form.submit();">
           {% for web in webography_form.webography.field.queryset %}
-            <option 
-            {%if request.session.webography_id == web.id%}
-              selected
-            {% endif %}
-            value="{{web.id}}">{{web.name}}</option>
-            {% endfor %}
-          </select>
+          <option {%if request.session.webography_id == web.id%} selected {% endif %} value="{{web.id}}">{{web.name}}
+          </option>
+          {% endfor %}
+        </select>
       </form>
 
-      
-          
-        <button class="btn btn-lg" data-toggle="modal" data-target="#editWebModal">
-          <i title="Renommer la webographie" class="fa fa-edit"></i>
-        </button>
-        <form class="" action="myReferences/deleteWebography" method="post">
+
+
+      <button class="btn" data-toggle="modal" data-target="#editWebModal">
+        <i title="Renommer la webographie" class="fa fa-edit"></i>
+      </button>
+      <form class="form-inline" action="myReferences/deleteWebography" method="post">
         {% csrf_token %}
-          <button class="btn btn-lg" type="submit">
-            <i title="Supprimer la webographie" class="fa fa-trash"></i>
-          </button>
-        </form>
+        <button class="btn" type="submit">
+          <i title="Supprimer la webographie" class="fa fa-trash"></i>
+        </button>
+      </form>
     </div>
 
 
@@ -56,13 +55,25 @@
 
     {%if reference_set is not None %}
 
-    <table class="table table-hover table-responsive-xl text-center">
+    <table class="table table-hover table-responsive-xl table-striped text-center">
       <thead class="thead-dark">
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Url</th>
-          <th scope="col">Bibtex</th>
-          <th scope="col">Apa</th>
+          <th scope="col">
+            <button class="btn-table-th btn" title="Tout copier" onclick="copyAllToClipBoard('url_copy_btn')"><i
+                class="fa fa-copy"></i> Url
+
+            </button>
+          </th>
+          <th scope="col">
+            <button class="btn-table-th btn" title="Tout copier" onclick="copyAllToClipBoard('bibtex_copy_btn')"><i
+                class="fa fa-copy"></i> Bibtex
+
+            </button> </th>
+          <th scope="col"><button class="btn-table-th btn" title="Tout copier"
+              onclick="copyAllToClipBoard('apa_copy_btn')"><i class="fa fa-copy"></i> APA
+
+            </button></th>
           <th></th>
         </tr>
       </thead>
@@ -71,126 +82,80 @@
         <tr>
           <th scope="row">{{ forloop.counter }}</th>
           <td class="url_reference">
-            <button
-              title="Cliquez-moi pour me copier dans votre presse papier !"
-              class="url_copy_btn btn"
-              onclick="copyRefToClipBoard('{{ forloop.counter0 }}','url')"
-            >
+            <button title="Cliquez-moi pour me copier dans votre presse papier !" class="url_copy_btn btn"
+              id="url_copy_btn{{ forloop.counter0 }}" onclick="copyRefToClipBoard(this.id)">
               {{ ref.url }}
             </button>
-            
+
           </td>
           <td class="bibtex_reference">
-            <button
-              title="Cliquez-moi pour me copier dans votre presse papier !"
-              class="bibtex_copy_btn btn"
-              onclick="copyRefToClipBoard('{{ forloop.counter0 }}', 'bibtex')"
-            >
+            <button title="Cliquez-moi pour me copier dans votre presse papier !" class="bibtex_copy_btn btn"
+              id="bibtex_copy_btn{{ forloop.counter0 }}" onclick="copyRefToClipBoard(this.id)">
               {{ ref.bibtex_reference }}
             </button>
-            
+
           </td>
           <td class="apa_reference">
-            <button
-              title="Cliquez-moi pour me copier dans votre presse papier !"
-              class="apa_copy_btn btn"
-              onclick="copyRefToClipBoard('{{ forloop.counter0 }}','apa')"
-            >
+            <button title="Cliquez-moi pour me copier dans votre presse papier !" class="apa_copy_btn btn"
+              id="apa_copy_btn{{ forloop.counter0 }}" onclick="copyRefToClipBoard(this.id)">
               {{ ref.apa_reference }}
             </button>
-            
+
           </td>
           <td>
-            <button
-              class="btn btn-lg"
-              data-toggle="modal" data-target="#editRefModal{{ref.id}}"
-            >
+            <button class="btn btn-lg" data-toggle="modal" data-target="#editRefModal{{ref.id}}">
               <i title="Modifier la référence" class="fa-lg fa fa-edit"></i>
             </button>
 
             <form method="post" action="/myReferences/deleteReference">
-            {% csrf_token %}
-              <button
-              class="btn btn-lg" type="submit" name="delete_ref" value="{{ref.id}};{{ref|get_type}}"
-              >
-              <i title="Supprimer la référence" class="fa-lg fa fa-trash"></i>
-            </button>
+              {% csrf_token %}
+              <button class="btn btn-lg" type="submit" name="delete_ref" value="{{ref.id}};{{ref|get_type}}">
+                <i title="Supprimer la référence" class="fa-lg fa fa-trash"></i>
+              </button>
             </form>
 
           </td>
         </tr>
         <!-- Modal edit ref -->
-        <div
-          class="modal fade"
-          id="editRefModal{{ref.id}}"
-          tabindex="-1"
-          role="dialog"
-          aria-hidden="false"
-        >
+        <div class="modal fade" id="editRefModal{{ref.id}}" tabindex="-1" role="dialog" aria-hidden="false">
           {% include "./reference_form.html" with webography=webography form=reference_form ref=ref %}
         </div>
-        
+
 
         {% endfor %}
-        
+
       </tbody>
     </table>
-      {%endif%}
+    {%endif%}
     {% endif %}
     {% endif %}
 
 
     <!-- Modal add webography -->
-    <div
-      class="modal fade"
-      id="addWebModal"
-      tabindex="-1"
-      role="dialog"
-      aria-hidden="false"
-    >
+    <div class="modal fade" id="addWebModal" tabindex="-1" role="dialog" aria-hidden="false">
       {% include "./webography_form.html" with form=webography_form edit=0%}
     </div>
 
     <!-- Modal edit webography -->
-    <div
-      class="modal fade"
-      id="editWebModal"
-      tabindex="-1"
-      role="dialog"
-      aria-hidden="false"
-    >
+    <div class="modal fade" id="editWebModal" tabindex="-1" role="dialog" aria-hidden="false">
       {% include "./webography_form.html" with form=webography_form edit=1%}
     </div>
 
     <!-- Modal add ref -->
-    <div
-      class="modal fade"
-      id="addRefModal"
-      tabindex="-1"
-      role="dialog"
-      aria-hidden="false"
-    >
+    <div class="modal fade" id="addRefModal" tabindex="-1" role="dialog" aria-hidden="false">
       {% include "./reference_form.html" with form=reference_form %}
     </div>
 
     <!-- Modal add manyref -->
-    <div
-      class="modal fade"
-      id="addManyRefModal"
-      tabindex="-1"
-      role="dialog"
-      aria-hidden="false"
-    >
-    {% include "./reference_form.html" with form=references_form manyRef=1%}
+    <div class="modal fade" id="addManyRefModal" tabindex="-1" role="dialog" aria-hidden="false">
+      {% include "./reference_form.html" with form=references_form manyRef=1%}
     </div>
-    
 
 
-    </div>
-  </div> <!--container -->
-  <script
-    type="text/javascript"
-    src="static/autotext/scripts/myReferences.js"
-  ></script>
+
+  </div>
+  </div>
+  <!--container -->
+  <script type="text/javascript" src="static/autotext/scripts/copyToClipboard.js"></script>
 </body>
 {% endblock %}

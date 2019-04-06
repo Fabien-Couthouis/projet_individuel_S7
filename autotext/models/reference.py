@@ -17,7 +17,7 @@ class Reference(models.Model):
         abstract = True
 
     def __str__(self):
-        string = "Reference : " + str(self.id) + " with url : " + str(self.url)
+        string = "Reference : " + str(self.pk) + " with url : " + str(self.url)
         return string
 
     @property

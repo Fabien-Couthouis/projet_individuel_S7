@@ -1,67 +1,67 @@
 <!-- templates/registration/index.html -->
 {% extends 'autotext/base.html' %} {% block content %}
+
 <body class="index-body">
-  <div class="container index-container">
+  <div class="container-fluid">
     <div class="">
       <form class="post-form col-md" method="post">
         {% csrf_token %}
 
-        <div class="">
 
-                
+
+
+        <div class="row">
+          <div class="col-sm">
+            <div class="controls">
+              <button width="20" type="submit" class="btn btn-custom btn-block">
+                Génerer ma webographie
+              </button>
+            </div>
+
+            <textarea required class="form-control index-textarea" rows="20" placeholder="Copier ici votre liste d'urls puis cliquez sur Générer ma webographie : http://... http://...
+              ..." type="urlList" id="id_urlList" name="urlList">{{ form.urlList.value }}</textarea>
+
+          </div>
 
           {%if webography_bib %}
 
-            <div class="index-tabs">
-              <div class="index-tab-2">
-                <label for="index-tab2-1">Bibtex</label>
-                <input id="index-tab2-1" name="index-tabs-two" type="radio" checked="checked">
-                <div class="row">
-                <textarea class="col-sm-5 form-control index-textarea" rows="15" type="urlList" id="id_urlList1" name="urlList">{{ form.urlList.value }}</textarea>   
-                  <textarea class="col-sm-5 form-control index-textarea" rows="20" readonly>{{ webography_bib }}
-                  </textarea>
-                </div>
+          <div class="index-tabs col-sm">
+            <div class="index-tab-2">
+              <label for="index-tab2-1">Bibtex</label>
+              <input id="index-tab2-1" name="index-tabs-two" type="radio" checked="checked" />
+              <div class="index-textarea-container">
+                <span title="Copier dans le presse papier" class="copy-btn" onclick="copyTextarea('textarea-bib')"><i
+                    class="fa fa-copy"></i></span>
+                <textarea id="textarea-bib" class="col-md form-control index-textarea" rows="20" readonly>{{ webography_bib }}
+                    </textarea>
               </div>
-              <div class="index-tab-2">
-                <label for="index-tab2-2">Apa</label>
-                <input id="index-tab2-2" name="index-tabs-two" type="radio">
-                <div class="row">
-                <textarea class="col-sm-5 form-control index-textarea" rows="15" type="urlList" id="id_urlList2" name="urlList">{{ form.urlList.value }}</textarea>   
-                  <textarea class="col-sm-5 form-control col-md index-textarea" rows="20" readonly>{{ webography_apa }}
-                  </textarea>
-                </div>
+
+            </div>
+            <div class="index-tab-2">
+              <label for="index-tab2-2">Apa</label>
+              <input id="index-tab2-2" name="index-tabs-two" type="radio" />
+              <div class="index-textarea-container">
+                <span title="Copier dans le presse papier" class="copy-btn btn"
+                  onclick="copyTextarea('textarea-apa')"><i class="fa fa-copy"></i></span>
+                <textarea id="textarea-apa" class="col-sm-5 form-control col-md index-textarea" rows="20" readonly>{{ webography_apa }}
+                    </textarea>
               </div>
             </div>
-
-           
-            
-
-          {% comment %} </div> {% endcomment %}
+          </div>
+          <!--index tab -->
           {%endif%}
+
+          <br />
 
         </div>
 
-        <br />
-
-        <button type="submit" class="btn btn-primary float-right">
-          Génerer ma webographie
-        </button>
       </form>
     </div>
   </div>
-  <span class="glyphicon glyphicon-search"></span>
 
 
-    <!-- Modal edit webography -->
-    <div
-      class="modal fade"
-      id="editWebModal"
-      index-tabindex="-1"
-      role="dialog"
-      aria-hidden="false"
-    >
-      {% include "./webography_form.html" with form=webography_form edit=1%}
-    </div>
 </body>
+
+<script type="text/javascript" src="static/autotext/scripts/copyToClipboard.js"></script>
 
 {% endblock %}

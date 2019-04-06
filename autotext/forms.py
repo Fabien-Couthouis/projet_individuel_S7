@@ -1,9 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm
 from django import forms
-from .models.reference import Reference
-from .models.referencePDF import ReferencePDF
+
 
 from .models.webography import Webography
 
@@ -23,19 +21,6 @@ class IndexForm(UrlListForm):
         super().__init__(*args, **kwargs)
         for myField in self.fields:
             self.fields[myField].widget.attrs['class'] = 'form-control'
-
-    format_styles = [
-        ('APA', 'APA'),
-        ('BIB', 'BIBTEX'),
-    ]
-
-    format_style = forms.ChoiceField(
-        required=False,
-        widget=forms.RadioSelect(),
-        choices=format_styles,
-        initial=format_styles[0],
-        label='Format : '
-    )
 
 
 class SignUpForm(UserCreationForm):

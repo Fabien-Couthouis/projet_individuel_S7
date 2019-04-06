@@ -38,13 +38,16 @@ def index(request):
             data = form.cleaned_data
             webography = Webography()
             webography.save()
-            set_to_session(request, webography)
             webography.add_refererences_from_urls(
                 raw_urls=data['urlList'])
+            apa = webography.get_formatted_webography()
+            bib = webography.get_bibtex_webography()
+
+            webography.delete()
 
             return render(request, 'autotext/index.html', {'form': form,
-                                                           'webography_apa': webography.get_formatted_webography(),
-                                                           'webography_bib': webography.get_bibtex_webography()})
+                                                           'webography_apa': apa,
+                                                           'webography_bib': bib})
 
     # if a GET (or any other method) we'll create a blank form
     else:

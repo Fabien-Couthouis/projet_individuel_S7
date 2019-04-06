@@ -2,121 +2,94 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
+
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Autotext</title>
 
     <!-- Latest compiled and minified CSS -->
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-      crossorigin="anonymous"
-    />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
     <!-- Latest compiled and minified JavaScript -->
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+    </script>
 
     <!-- FontAwesome -->
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
-      crossorigin="anonymous"
-    />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
 
     <!-- Styles -->
     <link rel="stylesheet" href="{% static 'autotext/style.css' %}" />
 
+    <link rel="shortcut icon" type="image/png" href="{% static 'autotext/images/logo.png' %}" />
 
-   
+
   </head>
 
   <header>
     <div class="header">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">
-          <img
-            src="{% static 'autotext/images/logo_white.png' %}"
-            width="30"
-            height="30"
-            class="d-inline-block align-top"
-            alt=""
-          />
+          <img src="{% static 'autotext/images/logo_white.png' %}" width="30" height="30"
+            class="d-inline-block align-top" alt="" />
           AutoText
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
           <ul class="navbar-nav">
-            <li class="nav-item active">
+            <li class="nav-item">
               <a class="nav-link" href="/myReferences">Gérer mes webographies</a>
             </li>
           </ul>
         </div>
         {% if user.is_authenticated %}
-          <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="" data-toggle="dropdown">
-                <i class="fa fa-user nav-icon">
-                    <span class="connect">{{user.username}}</span>
-                </i>
-            </a>
-            <div id="login-dp" class="row dropdown-menu">
-                <div class="">
-                    <a class="nav-link" href="accounts/logout/">
-                        <i class="fa fa-sign-out">
-                            <span class="userMenuText"> Déconnexion </span>
-                        </i>
-                    </a>
-                </div>
-            </div>
-        
-        {% else %}
         <div class="dropdown">
           <a class="nav-link dropdown-toggle" href="" data-toggle="dropdown">
-              <i class="fa fa-user nav-icon">
-                  <span class="connect"> Se connecter </span>
-              </i>
+            <img class="nav-icon" width="32" src="https://avatars.dicebear.com/v2/jdenticon/{{user.username}}.svg">
+            <span class="connect">{{user.username}}</span>
           </a>
           <div id="login-dp" class="row dropdown-menu">
+            <div class="">
+              <a class="nav-link" href="accounts/logout/">
+                <i class="fa fa-sign-out">
+                  <span class="userMenuText"> Déconnexion </span>
+                </i>
+              </a>
+            </div>
+          </div>
+
+          {% else %}
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="" data-toggle="dropdown">
+              <i class="fa fa-user nav-icon">
+                <span class="connect"> Se connecter </span>
+              </i>
+            </a>
+            <div id="login-dp" class="row dropdown-menu">
               <div class="col-md-12">
                 {% include "../registration/loginForm.html" %}
               </div>
-          </div>
-          {% endif %}
+            </div>
+            {% endif %}
       </nav>
     </div>
   </header>
 
   <br />
 
-    {% block content %} {% endblock %}
+  {% block content %} {% endblock %}
 
   <!-- <footer>F. Couthouis</footer> -->
+
 </html>
