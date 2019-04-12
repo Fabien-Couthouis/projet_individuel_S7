@@ -11,23 +11,20 @@ class ReferenceWeb(Reference):
 
     # def __init__(self, url=""):
     #     super().__init__(url)
-    #     self._content = self._get_content()
+    #     self._soup = self._get_soup()
 
     def _retrieve_content(self):
         """
-        Attempts to get the content at `url` by making an HTTP GET request.
+        Attempts to get the soup at `url` by making an HTTP GET request.
         If the content-type of response is some kind of HTML/XML, return the
-        text content, otherwise return None. Inspired from https://www.crummy.com/software/BeautifulSoup/bs4/doc/#
+        text content (soup), otherwise return None. Inspired from https://www.crummy.com/software/BeautifulSoup/bs4/doc/#
         """
 
         try:
             with closing(get(self.url, stream=True)) as resp:
                 if self._is_good_response(resp):
-                    rawContent = resp.content
-                    formattedContent = BeautifulSoup(
-                        rawContent, 'html.parser')
-
-                    content = formattedContent
+                    raw_content = resp.content
+                    soup = BeautifulSoup(raw_content, 'html.parser')
 
                 else:
                     return None
@@ -37,7 +34,7 @@ class ReferenceWeb(Reference):
                 'Error during requests to {0} : {1}'.format(self.url, str(e)))
             return None
 
-        return content
+        return soup
 
     def _is_good_response(self, resp):
         """
@@ -48,25 +45,39 @@ class ReferenceWeb(Reference):
                 and content_type is not None
                 and content_type.find('html') > -1)
 
-    def get_author_name(self, content):
-        # Is one of them present in one of the elements below ?
-        keyWords = ["by", "author"]
-        metas = content.find_all('meta')
-        elements = ['name', 'property']
+    def get_author(self, soup):
+        searches = [
+            {'name': re.compile(r"author-name")},
+            {'property': re.compile(r"author-name")},
+            {'class': re.compile(r"author-name")},
+            {'name': re.compile(r"author")},
+            {'property': re.compile(r"author")},
+            {'class': re.compile(r"author")},
+            {'name': re.compile(r"by")},
+            {'content': re.compile(r"by")},
+        ]
+        element_types = ['content']
 
-        name = self._get_meta_content(metas, elements, keyWords)
+        name = self._get_data(soup, searches, element_types)
 
+        # Author name not found
         if name == "":
             self.log_error("No author found for this url : " + self.url)
+            return name
 
-        formattedName = self._format_author_name(name)
-
-        return formattedName
+        # Return formatted
+        return self._format_author_name(name)
 
     def _format_author_name(self, name):
         '''Transform raw author name into formatted author name. For instance : http://www.nytimes/1550mireille-mathieu -> Mireille Mathieu'''
+        # If sentence
+        if name.count(" ") > 5:
+            regex = re.search('(by|with|par|avec)(.*?)(,|.),', name)
+            if regex:
+                name = regex.group(2)
+
         # If link
-        if "/" in name:
+        elif "/" in name:
             name = re.search(r'[^/]+(?=/$|$)', name).group(0)
 
         if "-" in name:
@@ -78,40 +89,47 @@ class ReferenceWeb(Reference):
         name = re.sub(r"\d+", "", name)
         # Remove "By"
         name = re.sub("[B|b]y", "", name)
+        # Translate "et"
+        name = re.sub("[E|e]t", "and", name)
         # Remove leading whitespaces
         name = name.lstrip()
 
         return name
 
-    def get_title(self, content):
-        # Is one of them present in one of the elements below ?
-        keyWords = ["title"]
-        metas = content.find_all('meta')
-        elements = ['property']
+    def get_title(self, soup):
+        searches = [
+            {'property': 'og:title'}
+        ]
+        element_types = ['content']
 
-        title = self._get_meta_content(metas, elements, keyWords)
+        title = self._get_data(soup, searches, element_types)
 
         if title == "":
             self.log_error("No title found for this url : " + self.url)
 
         return title
 
-    def get_publication_date(self, content):
-        keyWords = ["published"]
-        metas = content.find_all('meta')
-        elements = ['property']
+    def get_publication_date(self, soup):
+        searches = [
+            {'property': re.compile(r"published")},
+            {'property': re.compile(r"publication")},
+            {'itemprop': re.compile(r"published")},
+            {'class': re.compile(r"date")}
+        ]
 
-        publication_date = self._get_meta_content(
-            metas, elements, keyWords)
+        element_types = ['content', 'datetime']
 
-        # Convert pubdate from string to datetime
-        formatted_publication_date = self._format_publication_date(
-            publication_date)
-
-        if formatted_publication_date == "":
+        pub_date = self._get_data(soup, searches, element_types)
+        # Not found
+        if pub_date == "":
             self.log_error("No date found for this url : " + self.url)
+            return ""
 
-        return formatted_publication_date
+        # Return formatted
+        try:
+            return self._format_publication_date(pub_date)
+        except:
+            return ""
 
     def _format_publication_date(self, string_iso):
         """Convert string publication date into an exploitable datetime. """
@@ -123,45 +141,42 @@ class ReferenceWeb(Reference):
         dt = datetime.strptime(string_iso, "%Y-%m-%d")
         return dt
 
-    def _get_meta_content(self, metas, elements, keyWords):
-        """
-        Use beautifulsoup to get content corresponding to the keywords in the given element, parsing meta tags into the htlm doc.
+    def _get_data(self, soup, searches, element_types):
+        ''' Retrieve soup from searches, in the given order '''
+        for search in searches:
+            element = soup.find(attrs=search)
+            if (element is not None):
+                for element_type in element_types:
+                    try:
+                        print(element[element_type])
+                        return element[element_type]
+                    except KeyError:
+                        return element.text
 
-        Arguments:
-            metas -- List of all meta tags in the html document.
-            elements -- List of all elements in the meta tag wherein we want a keyword to be.
-            keyWords -- List of keywords to search in the referenced elements.
-     """
-        i = 0
-        metaContent = ""
+                        # # If last alement
+                        # if element_type == element_types[-1] and search == searches[-1]:
+                        #     if element.text:
+                        #         print(element.text)
 
-        while (metaContent == "" and i < len(metas)):
-            meta = metas[i]
+                        #         return element.text
 
-            for element in elements:
-                if not (meta.get(element) is None):
-                    if any(keyWord in meta.get(element) for keyWord in keyWords):
-                        metaContent = meta.get('content')
-                        # metaContent found : we can break the for
-                        break
-
-            # No metaContent found : iterate on the next <meta> tag
-            i += 1
-
-        return metaContent
+        # No element found : return empty string
+        return ''
 
     def _get_bibtex_reference(self):
-        content = self._retrieve_content()
-        author = self.get_author_name(content)
-        title = self.get_title(content)
-        pubDate = self.get_publication_date(content)
+        soup = self._retrieve_content()
+        author = self.get_author(soup)
+        title = self.get_title(soup)
+        pubDate = self.get_publication_date(soup)
         # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
         bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
                   ).format(author=author,
                            title=title,
                            url=self.url,
-                           year=pubDate.strftime("%Y"),
-                           month=pubDate.strftime("%B"),
+                           year=pubDate.strftime("%Y") if (
+                               pubDate != "") else "",
+                           month=pubDate.strftime("%B") if (
+                               pubDate != "") else "",
                            note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
 
         return bibRef

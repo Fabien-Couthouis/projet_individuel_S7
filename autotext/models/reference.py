@@ -4,6 +4,7 @@ import io
 import pybtex.database.input.bibtex
 import six
 from django.db import models
+import re
 
 
 class Reference(models.Model):
@@ -79,8 +80,11 @@ class Reference(models.Model):
             output = io.StringIO()
             pybtex_html_backend.write_to_stream(data_formatted, output)
 
-            # We remove "\n" at the end of the output value
+            # Remove "\n" at the end of the output value
             formatted_ref = output.getvalue().replace("\n", "")
+
+            # Remove useless array at the begining
+            formatted_ref = re.sub(r'\[(.*?)\] ', '', formatted_ref)
 
             return formatted_ref
 

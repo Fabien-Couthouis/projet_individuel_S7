@@ -16,7 +16,8 @@
 
     {%else%}
     <div class="row">
-      <button class="btn btn-lg" data-toggle="modal" data-target="#addWebModal">
+      <button class="btn webographies-btn" data-toggle="modal" data-target="#addWebModal">
+        
         <i title="Ajouter une webographie" class="fa fa-plus-circle"></i>
       </button>
 
@@ -33,12 +34,12 @@
 
 
 
-      <button class="btn" data-toggle="modal" data-target="#editWebModal">
+      <button class="btn webographies-btn" data-toggle="modal" data-target="#editWebModal">
         <i title="Renommer la webographie" class="fa fa-edit"></i>
       </button>
       <form class="form-inline" action="myReferences/deleteWebography" method="post">
         {% csrf_token %}
-        <button class="btn" type="submit">
+        <button class="btn webographies-btn" type="submit">
           <i title="Supprimer la webographie" class="fa fa-trash"></i>
         </button>
       </form>
@@ -46,11 +47,11 @@
 
 
 
-    <button class="float-right btn btn-lg" data-toggle="modal" data-target="#addRefModal">
-      <i title="Ajouter une référence" class="fa fa-2x fa-book"></i>
+    <button class="float-right webography-btn btn btn-lg" data-toggle="modal" data-target="#addRefModal">
+      <i title="Ajouter une référence" class="fa fa-2x fa-book books-icon"></i>
     </button>
-    <button class="float-right btn btn-lg" data-toggle="modal" data-target="#addManyRefModal">
-      <i title="Ajouter plusieurs références" class="fa fa-2x fa-plus-circle"></i>
+    <button class="float-right webography-btn btn btn-lg"  data-toggle="modal" data-target="#addManyRefModal">
+      <i title="Ajouter plusieurs références" class=""><img class= "books-icon" src="static/autotext/icons/i_books.png"></i>
     </button>
 
     {%if reference_set is not None %}

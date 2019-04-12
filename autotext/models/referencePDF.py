@@ -5,6 +5,7 @@ import PyPDF2
 import tempfile
 import pdftitle
 import gscholar
+from ..Helpers import sscholar
 
 
 class ReferencePDF(Reference):
@@ -28,20 +29,17 @@ class ReferencePDF(Reference):
 
         return content
 
-    # def get_metadata(self):
-    #     inputPdf = PyPDF2.PdfFileReader(open(self.content.name, "rb"))
-    #     metadata = inputPdf.getDocumentInfo()
-
-    #     return metadata
-
     def _get_bibtex_reference(self):
         content = self._retrieve_content()
         title = pdftitle.get_title_from_file(content.name)
-        source = gscholar.query(title)
 
-        if source:
-            bibref = source[0]
-        else:
-            bibref = "undefined"
+        # SemanticScholar
+        bibref = sscholar.get_bib_from_title(title)
+
+        # Try Gscholar if not found on semanticscholar
+        if bibref == "undefined":
+            sources = gscholar.query(title)
+            if sources:
+                bibref = sources[0]
 
         return bibref
