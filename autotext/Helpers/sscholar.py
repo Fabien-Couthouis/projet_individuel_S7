@@ -15,7 +15,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 
 SEMANTIC_SCHOLAR_QUERY_URL = "https://www.semanticscholar.org/search?q="
-SEMANTIC_SCHOLAR_API_URL = "http://api.semanticscholar.org/v1/paper/"
 
 
 def get_bib_from_title(title):
