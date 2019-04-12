@@ -53,5 +53,5 @@ def get_bib_from_title(title):
         print("Loading took too much time!")
         bib = "undefined"
 
-    browser.close()
+    browser.quit()
     return bib
