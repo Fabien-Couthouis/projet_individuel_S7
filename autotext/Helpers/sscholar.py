@@ -2,8 +2,8 @@
 
 """
 Library to query Semantic Scholar.
-Call the method query with a string which contains the full search
-string. Query will return a list of citations.
+Call the method get_bib_from_title with a string which contains the title of the article.
+This will return the bibtx citation of the article.
 """
 import re
 from bs4 import BeautifulSoup
