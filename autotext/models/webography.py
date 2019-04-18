@@ -65,10 +65,10 @@ class Webography(models.Model):
         bib_webography = []
         # Parse the 2 reference_set
         for ref in self.referencepdf_set.all():
-            bib_webography.append(ref.bibtex_reference)
+            bib_webography.append(ref.bibtex_reference.replace("\n", ""))
 
         for ref in self.referenceweb_set.all():
-            bib_webography.append(ref.bibtex_reference)
+            bib_webography.append(ref.bibtex_reference.replace("\n", ""))
 
         return bib_webography
 

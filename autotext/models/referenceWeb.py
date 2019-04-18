@@ -9,10 +9,6 @@ from datetime import datetime
 
 class ReferenceWeb(Reference):
 
-    # def __init__(self, url=""):
-    #     super().__init__(url)
-    #     self._soup = self._get_soup()
-
     def _retrieve_content(self):
         """
         Attempts to get the soup at `url` by making an HTTP GET request.
@@ -25,6 +21,7 @@ class ReferenceWeb(Reference):
                 if self._is_good_response(resp):
                     raw_content = resp.content
                     soup = BeautifulSoup(raw_content, 'html.parser')
+                    return soup
 
                 else:
                     return None
@@ -33,8 +30,6 @@ class ReferenceWeb(Reference):
             self.log_error(
                 'Error during requests to {0} : {1}'.format(self.url, str(e)))
             return None
-
-        return soup
 
     def _is_good_response(self, resp):
         """
@@ -91,7 +86,7 @@ class ReferenceWeb(Reference):
         name = re.sub("[B|b]y", "", name)
         # Translate "et"
         name = re.sub("[E|e]t", "and", name)
-        # Remove leading whitespaces
+        # Remove leading whitespaces and newlines
         name = name.lstrip()
 
         return name
@@ -143,6 +138,7 @@ class ReferenceWeb(Reference):
 
     def _get_data(self, soup, searches, element_types):
         ''' Retrieve soup from searches, in the given order '''
+        print(type(soup))
         for search in searches:
             element = soup.find(attrs=search)
             if (element is not None):
@@ -164,19 +160,18 @@ class ReferenceWeb(Reference):
         return ''
 
     def _get_bibtex_reference(self):
+        print("TRY TO GET BIBTEX REFERENCE")
         soup = self._retrieve_content()
+        print("get author")
         author = self.get_author(soup)
+        print("get title")
+
         title = self.get_title(soup)
+        print("get pubate")
+
         pubDate = self.get_publication_date(soup)
         # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
         bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
-                  ).format(author=author,
-                           title=title,
-                           url=self.url,
-                           year=pubDate.strftime("%Y") if (
-                               pubDate != "") else "",
-                           month=pubDate.strftime("%B") if (
-                               pubDate != "") else "",
-                           note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
+                  ).format(author=author, title=title, url=self.url, year=pubDate.strftime("%Y") if (pubDate != "") else "", month=pubDate.strftime("%B") if (pubDate != "") else "", note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
 
-        return bibRef
+        return bibRef.rstrip()

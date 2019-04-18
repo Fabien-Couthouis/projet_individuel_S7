@@ -44,8 +44,7 @@ def get_bib_from_title(title):
         content = soup.find('cite', {'class': 'formatted-citation'})
         bib = content.text
 
-        # Remove carriage return and double spaces
-        bib = bib.replace("\n", "")
+        # Remove carriage double spaces
         bib = bib.replace("  ", "")
 
     except TimeoutException:
@@ -53,4 +52,5 @@ def get_bib_from_title(title):
         bib = "undefined"
 
     browser.quit()
+    print(bib)
     return bib

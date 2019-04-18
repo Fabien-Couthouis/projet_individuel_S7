@@ -42,4 +42,4 @@ class ReferencePDF(Reference):
             if sources:
                 bibref = sources[0]
 
-        return bibref
+        return bibref.rstrip()

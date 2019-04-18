@@ -26,6 +26,7 @@ class Reference(models.Model):
         if self._bibtex_reference is None or self._bibtex_reference == "":
             self._bibtex_reference = self._get_bibtex_reference()
             self.save()
+            print("ACCESS TO GETTER")
 
         return self._bibtex_reference
 
