@@ -1,10 +1,12 @@
+import re
+from contextlib import closing
+from datetime import datetime
 from requests import get
 from requests.exceptions import RequestException
-from contextlib import closing
 from bs4 import BeautifulSoup
 from .reference import Reference
-import re
-from datetime import datetime
+
+DEBUG = True
 
 
 class ReferenceWeb(Reference):
@@ -19,8 +21,8 @@ class ReferenceWeb(Reference):
         try:
             with closing(get(self.url, stream=True)) as resp:
                 if self._is_good_response(resp):
-                    raw_content = resp.content
-                    soup = BeautifulSoup(raw_content, 'html.parser')
+                    soup = BeautifulSoup(resp.content.decode(
+                        'utf-8', 'ignore'), 'html.parser')
                     return soup
 
                 else:
@@ -41,6 +43,10 @@ class ReferenceWeb(Reference):
                 and content_type.find('html') > -1)
 
     def get_author(self, soup):
+        '''Retrieve author name in html'''
+        if DEBUG:
+            self.log_error("Getting author ...")
+
         searches = [
             {'name': re.compile(r"author-name")},
             {'property': re.compile(r"author-name")},
@@ -53,20 +59,19 @@ class ReferenceWeb(Reference):
         ]
         element_types = ['content']
 
-        name = self._get_data(soup, searches, element_types)
-
-        # Author name not found
-        if name == "":
-            self.log_error("No author found for this url : " + self.url)
-            return name
-
-        # Return formatted
-        return self._format_author_name(name)
+        try:
+            name = self._get_data(soup, searches, element_types)
+            return self._format_author_name(name)
+        except ValueError as e:
+            if DEBUG:
+                self.log_error(
+                    "No author found for reference : {0}.\nError : {1}".format(str(self), str(e)))
+            return ""
 
     def _format_author_name(self, name):
         '''Transform raw author name into formatted author name. For instance : http://www.nytimes/1550mireille-mathieu -> Mireille Mathieu'''
         # If sentence
-        if name.count(" ") > 5:
+        if name.count(' ') > 5:
             regex = re.search('(by|with|par|avec)(.*?)(,|.),', name)
             if regex:
                 name = regex.group(2)
@@ -83,28 +88,36 @@ class ReferenceWeb(Reference):
         # Remove digits
         name = re.sub(r"\d+", "", name)
         # Remove "By"
-        name = re.sub("[B|b]y", "", name)
+        name = re.sub("[B|b]y ", "", name)
         # Translate "et"
-        name = re.sub("[E|e]t", "and", name)
+        name = re.sub(" [E|e]t ", " and ", name)
         # Remove leading whitespaces and newlines
         name = name.lstrip()
 
         return name
 
     def get_title(self, soup):
+        '''Retrieve reference title in html'''
+        if DEBUG:
+            self.log_error("Getting title ...")
+
         searches = [
             {'property': 'og:title'}
         ]
         element_types = ['content']
 
-        title = self._get_data(soup, searches, element_types)
+        try:
+            title = self._get_data(soup, searches, element_types)
+            return title
 
-        if title == "":
-            self.log_error("No title found for this url : " + self.url)
-
-        return title
+        except ValueError as e:
+            if DEBUG:
+                self.log_error(
+                    "No title found for reference : {0}.\nError : {1}".format(str(self), str(e)))
+            return ""
 
     def get_publication_date(self, soup):
+        self.log_error("Getting publication date ...")
         searches = [
             {'property': re.compile(r"published")},
             {'property': re.compile(r"publication")},
@@ -114,16 +127,15 @@ class ReferenceWeb(Reference):
 
         element_types = ['content', 'datetime']
 
-        pub_date = self._get_data(soup, searches, element_types)
-        # Not found
-        if pub_date == "":
-            self.log_error("No date found for this url : " + self.url)
-            return ""
-
-        # Return formatted
         try:
+            pub_date = self._get_data(soup, searches, element_types)
+            # Return formatted
             return self._format_publication_date(pub_date)
-        except:
+
+        except ValueError as e:
+            if DEBUG:
+                self.log_error(
+                    "No date found for this url : {0}.\nError : {1}".format(str(self), str(e)))
             return ""
 
     def _format_publication_date(self, string_iso):
@@ -138,40 +150,35 @@ class ReferenceWeb(Reference):
 
     def _get_data(self, soup, searches, element_types):
         ''' Retrieve soup from searches, in the given order '''
-        print(type(soup))
         for search in searches:
+            # print(search)
             element = soup.find(attrs=search)
-            if (element is not None):
+            if element is not None:
                 for element_type in element_types:
                     try:
-                        print(element[element_type])
                         return element[element_type]
                     except KeyError:
                         return element.text
 
-                        # # If last alement
-                        # if element_type == element_types[-1] and search == searches[-1]:
-                        #     if element.text:
-                        #         print(element.text)
-
-                        #         return element.text
-
         # No element found : return empty string
-        return ''
+        return ""
 
     def _get_bibtex_reference(self):
-        print("TRY TO GET BIBTEX REFERENCE")
+        if DEBUG:
+            self.log_error("Getting bibtex reference ...")
         soup = self._retrieve_content()
-        print("get author")
+
         author = self.get_author(soup)
-        print("get title")
-
         title = self.get_title(soup)
-        print("get pubate")
-
         pubDate = self.get_publication_date(soup)
+
         # Triple curly brackets because we want the info to be in this format in the string : {Author Name}
         bibRef = ("@misc{{website, author = {{{author}}}, title = {{{title}}}, url = {{{url}}}, year={{{year}}}, month={{{month}}}, note = {{{note}}}}}"
-                  ).format(author=author, title=title, url=self.url, year=pubDate.strftime("%Y") if (pubDate != "") else "", month=pubDate.strftime("%B") if (pubDate != "") else "", note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
+                  ).format(author=author, title=title,
+                           url=self.url, year=pubDate.strftime(
+                               "%Y") if (pubDate != "") else "",
+                           month=pubDate.strftime("%B") if (
+                               pubDate != "") else "",
+                           note=("Online, accessed " + datetime.now().strftime('%d %B %Y')))
 
         return bibRef.rstrip()

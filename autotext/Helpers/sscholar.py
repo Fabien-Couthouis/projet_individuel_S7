@@ -3,9 +3,9 @@
 """
 Library to query Semantic Scholar.
 Call the method get_bib_from_title with a string which contains the title of the article.
-This will return the bibtx citation of the article.
+This will return the bibtx citation of the article, using selenium and beautifulsoup.
+By Fabien Couthouis
 """
-import re
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
@@ -52,5 +52,4 @@ def get_bib_from_title(title):
         bib = "undefined"
 
     browser.quit()
-    print(bib)
     return bib

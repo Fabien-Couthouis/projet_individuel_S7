@@ -1,11 +1,9 @@
-from django.db import models
 from urlextract import URLExtract
 import requests
 from django.contrib.auth import get_user_model
-
+from django.db import models
 from .referenceWeb import ReferenceWeb
 from .referencePDF import ReferencePDF
-from pprint import pprint
 
 
 class Webography(models.Model):
@@ -40,6 +38,7 @@ class Webography(models.Model):
         return structured_urls
 
     def add_reference(self, url, bibtex_reference=None, apa_reference=None):
+        ''' Automatically add a reference in this webography.'''
         r = requests.get(url)
         content_type = r.headers['Content-Type'].lower()
         if 'application/pdf' in content_type:
@@ -72,7 +71,8 @@ class Webography(models.Model):
 
         return bib_webography
 
-    def get_formatted_webography(self, style='apa'):
+    def get_formatted_webography(self):
+        '''Get the webography in the apa format'''
         formatted_webography = []
         this = Webography.objects.get(id=self.id)
 

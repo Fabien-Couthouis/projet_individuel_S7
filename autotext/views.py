@@ -1,15 +1,10 @@
+from itertools import chain
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
-from itertools import chain
 from django.template import loader
 from django.http import HttpResponse
 
-from .forms import UrlListForm
-from .forms import IndexForm
-
-from .forms import SignUpForm
-from .forms import ReferenceForm
-from .forms import WebographyForm
+from .forms import UrlListForm, IndexForm, SignUpForm, ReferenceForm, WebographyForm
 
 from .models.webography import Webography
 from .models.referencePDF import ReferencePDF
