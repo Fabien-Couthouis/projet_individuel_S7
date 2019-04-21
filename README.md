@@ -1,6 +1,5 @@
 # projet_individuel_S8
 
-[!alt text](https://github.com/Fabien-Couthouis/projet_individuel_S8/blob/master/autotext/static/autotext/images/logo.png)
 Automatic webography generation website
 
 ### Installation
