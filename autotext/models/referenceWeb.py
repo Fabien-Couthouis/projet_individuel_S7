@@ -1,5 +1,4 @@
 import re
-from contextlib import closing
 from datetime import datetime
 from requests import get
 from requests.exceptions import RequestException
@@ -15,37 +14,23 @@ class ReferenceWeb(Reference):
         """
         Attempts to get the soup at `url` by making an HTTP GET request.
         If the content-type of response is some kind of HTML/XML, return the
-        text content (soup), otherwise return None. Inspired from https://www.crummy.com/software/BeautifulSoup/bs4/doc/#
+        text content (soup), otherwise return None.
         """
-
         try:
-            with closing(get(self.url, stream=True)) as resp:
-                if self._is_good_response(resp):
-                    soup = BeautifulSoup(resp.content.decode(
-                        'utf-8', 'ignore'), 'html.parser')
-                    return soup
-
-                else:
-                    return None
+            response = get(self.url, stream=True)
+            soup = BeautifulSoup(response.content.decode(
+                'utf-8', 'ignore'), 'html.parser')
+            return soup
 
         except RequestException as e:
-            self.log_error(
+            self._log_error(
                 'Error during requests to {0} : {1}'.format(self.url, str(e)))
             return None
-
-    def _is_good_response(self, resp):
-        """
-        Returns True if the response seems to be HTML, False otherwise.
-        """
-        content_type = resp.headers['Content-Type'].lower()
-        return (resp.status_code == 200
-                and content_type is not None
-                and content_type.find('html') > -1)
 
     def get_author(self, soup):
         '''Retrieve author name in html'''
         if DEBUG:
-            self.log_error("Getting author ...")
+            self._log_error("Getting author ...")
 
         searches = [
             {'name': re.compile(r"author-name")},
@@ -61,14 +46,14 @@ class ReferenceWeb(Reference):
 
         try:
             name = self._get_data(soup, searches, element_types)
-            return self._format_author_name(name)
+            return self._format_author(name)
         except ValueError as e:
             if DEBUG:
-                self.log_error(
+                self._log_error(
                     "No author found for reference : {0}.\nError : {1}".format(str(self), str(e)))
             return ""
 
-    def _format_author_name(self, name):
+    def _format_author(self, name):
         '''Transform raw author name into formatted author name. For instance : http://www.nytimes/1550mireille-mathieu -> Mireille Mathieu'''
         # If sentence
         if name.count(' ') > 5:
@@ -99,7 +84,7 @@ class ReferenceWeb(Reference):
     def get_title(self, soup):
         '''Retrieve reference title in html'''
         if DEBUG:
-            self.log_error("Getting title ...")
+            self._log_error("Getting title ...")
 
         searches = [
             {'property': 'og:title'}
@@ -112,12 +97,12 @@ class ReferenceWeb(Reference):
 
         except ValueError as e:
             if DEBUG:
-                self.log_error(
+                self._log_error(
                     "No title found for reference : {0}.\nError : {1}".format(str(self), str(e)))
             return ""
 
     def get_publication_date(self, soup):
-        self.log_error("Getting publication date ...")
+        self._log_error("Getting publication date ...")
         searches = [
             {'property': re.compile(r"published")},
             {'property': re.compile(r"publication")},
@@ -134,18 +119,18 @@ class ReferenceWeb(Reference):
 
         except ValueError as e:
             if DEBUG:
-                self.log_error(
+                self._log_error(
                     "No date found for this url : {0}.\nError : {1}".format(str(self), str(e)))
             return ""
 
-    def _format_publication_date(self, string_iso):
+    def _format_publication_date(self, date_iso):
         """Convert string publication date into an exploitable datetime. """
         # We need to remove the ":" because '%z' in strptime doesnt requiere any ":" so that we do not get any error.
         # See https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior for more info.
-        string_iso = string_iso.replace(":", "")
+        date_iso = date_iso.replace(":", "")
         # Remove utc info and hours, sometimes the format differs and we do not really care about hours
-        string_iso = string_iso.split("T")[0]
-        dt = datetime.strptime(string_iso, "%Y-%m-%d")
+        date_iso = date_iso.split("T")[0]
+        dt = datetime.strptime(date_iso, "%Y-%m-%d")
         return dt
 
     def _get_data(self, soup, searches, element_types):
@@ -165,7 +150,7 @@ class ReferenceWeb(Reference):
 
     def _get_bibtex_reference(self):
         if DEBUG:
-            self.log_error("Getting bibtex reference ...")
+            self._log_error("Getting bibtex reference ...")
         soup = self._retrieve_content()
 
         author = self.get_author(soup)

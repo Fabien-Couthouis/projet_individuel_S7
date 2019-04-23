@@ -36,6 +36,7 @@ pdftitle == 20170309
 
 # autotext/models/reference.py: 4
 pybtex >= 0.22.2
+pybtex-apa-style >= 1.3
 
 # autotext/models/referencePDF.py: 2,3
 # autotext/models/referenceWeb.py: 1,2

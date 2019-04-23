@@ -2,6 +2,11 @@
 
 Automatic webography generation website
 
+### Information
+
+[Final report (in french)](https://www.google.com)
+[Datasheet](https://www.google.com)
+
 ### Installation
 
 1. Clone the repository : `git clone https://github.com/Fabien-Couthouis/projet_individuel_S8.git`
@@ -10,4 +15,4 @@ Automatic webography generation website
 
 ### Launching
 
-> python managepy runserver
+> python manage.py runserver

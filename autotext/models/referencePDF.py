@@ -1,9 +1,9 @@
 import tempfile
 import pdftitle
 import gscholar
-from .reference import Reference
 from requests import get
 from requests.exceptions import RequestException
+from .reference import Reference
 from ..Helpers import sscholar
 
 
@@ -22,7 +22,7 @@ class ReferencePDF(Reference):
             content = temp
 
         except RequestException as e:
-            self.log_error(
+            self._log_error(
                 'Error during requests to {0} : {1}'.format(self.url, str(e)))
             return None
 

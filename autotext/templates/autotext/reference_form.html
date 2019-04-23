@@ -6,7 +6,11 @@
         {%if ref%}
           <h3 class="modal-title" id="addRefModalLabel">Modifier la référence</h5>
         {%else%}
-          <h3 class="modal-title" id="addRefModalLabel">Ajouter une référence</h5>
+            {%if manyRef%}
+              <h3 class="modal-title" id="addRefModalLabel">Ajouter plusieurs références</h5>
+            {%else%}
+              <h3 class="modal-title" id="addRefModalLabel">Ajouter une référence</h5>
+            {%endif%}
         {%endif%}
       </div>
       <div class="modal-body">

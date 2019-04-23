@@ -1,10 +1,8 @@
-# import spacy
-# from spacy_cld import LanguageDetector
 import io
+import re
 import pybtex.database.input.bibtex
 import six
 from django.db import models
-import re
 
 
 class Reference(models.Model):
@@ -57,7 +55,7 @@ class Reference(models.Model):
         raise NotImplementedError(
             'subclasses must override get_bibtext_reference()!')
 
-    def _get_formatted_reference(self, formatStyle='apa'):
+    def _get_formatted_reference(self, format_style='apa'):
         """
         Get the reference formatted into one of the possible formats.
         FormatStyle can be 'alpha', 'plain', 'unsrt', 'unsrtalpha' or 'apa'. Default = 'apa'.
@@ -68,7 +66,7 @@ class Reference(models.Model):
             return "undefined"
         else:
             pybtex_style = pybtex.plugin.find_plugin(
-                'pybtex.style.formatting', formatStyle)()
+                'pybtex.style.formatting', format_style)()
             pybtex_html_backend = pybtex.plugin.find_plugin(
                 'pybtex.backends', 'text')()
             pybtex_parser = pybtex.database.input.bibtex.Parser()
@@ -95,5 +93,5 @@ class Reference(models.Model):
 
     #     return doc._.languages
 
-    def log_error(self, e):
+    def _log_error(self, e):
         print(e)
