@@ -203,9 +203,7 @@ def editWebography(request):
 
 
 def deleteWebography(request):
-    print("o")
     if request.method == 'POST':
-
         webography_id = request.session.get('webography_id', None)
 
         webography = Webography.objects.get(id=webography_id)
