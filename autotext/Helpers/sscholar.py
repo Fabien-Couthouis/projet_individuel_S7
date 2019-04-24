@@ -24,7 +24,7 @@ def get_bib_from_title(title):
     browser = Firefox(firefox_options=options)
 
     browser.get(url)
-    delay = 10  # seconds max until response
+    delay = 12  # seconds max until response
     try:
         # Wait for page loading
         WebDriverWait(browser, delay).until(

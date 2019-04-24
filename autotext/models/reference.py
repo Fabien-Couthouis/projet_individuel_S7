@@ -73,8 +73,15 @@ class Reference(models.Model):
 
             data = pybtex_parser.parse_stream(
                 six.StringIO(self.bibtex_reference))
+
+            # Correct the "missing entry : booktitle" error
+            key = data.entries.keys()[0]
+            if not data.entries[key].fields.get("booktitle"):
+                data.entries[key].fields["booktitle"] = ""
+
             data_formatted = pybtex_style.format_entries(
                 six.itervalues(data.entries))
+
             output = io.StringIO()
             pybtex_html_backend.write_to_stream(data_formatted, output)
 
