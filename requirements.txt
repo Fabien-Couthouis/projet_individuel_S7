@@ -32,7 +32,7 @@ beautifulsoup4 >= 4.7.1
 gscholar >= 1.6.1
 
 # autotext/models/referencePDF.py: 6
-pdftitle == 20170309
+pdftitle == 0.3
 
 # autotext/models/reference.py: 4
 pybtex >= 0.22.2
