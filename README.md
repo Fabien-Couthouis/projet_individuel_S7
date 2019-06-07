@@ -5,7 +5,6 @@ Automatic webography generation website
 ### Information
 
 [Final report (in french)](https://github.com/Fabien-Couthouis/projet_individuel_S8/blob/master/final_report.pdf)
-[Datasheet]()
 
 ### Installation
 
